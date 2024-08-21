@@ -6,8 +6,8 @@ from user.models import User
 # Create your models here.
 class AIQuestionFinished(models.Model):
     aiquestion = models.AutoField(primary_key=True)
-    keywords = models.JSONField()
-    content = models.JSONField()
+    keywords = models.JSONField(default=list)
+    content = models.JSONField(default=list)
 
     class Meta:
         managed = True
@@ -17,10 +17,11 @@ class AIQuestionFinished(models.Model):
 class ReadingNote(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
     aiquestion = models.ForeignKey(AIQuestionFinished, on_delete=models.CASCADE, null=True)
-    keywords = models.JSONField()
+    keywords = models.JSONField(default=list)
     sentence = models.CharField(max_length=100)
+    sentence_image = models.CharField(max_length=256, blank=True, default="")
     content = models.CharField(max_length=200)
-    written_at = models.DateTimeField()
+    written_at = models.DateField()
     release_or_not = models.BooleanField(default=False)
 
     class Meta:
@@ -43,7 +44,7 @@ class PreReadingNote(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=200)
-    written_at = models.DateTimeField()
+    written_at = models.DateField()
 
     class Meta:
         managed = True

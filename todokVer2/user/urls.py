@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # 유저 CRUD
     path('register/', views.RegisterAPIView.as_view()),
     path('base/<int:user_id>/', views.UserInfoAPIView.as_view()),
     path('base/login/', views.LoginAPIView.as_view()),
@@ -12,4 +13,8 @@ urlpatterns = [
     # 카카오
     path('kakao/callback/', views.kakao_callback, name='kakao_callback'),
     path('kakao/login/finish/', views.KakaoLogin.as_view(), name='kakao_login_todjango'),
+
+    # Personalizing
+    path('personalizing/', views.OnBoardingAPIView.as_view()),
+    path('searched/<int:user_id>/', views.RecentSearchedAPIView.as_view()),
 ]

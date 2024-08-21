@@ -1,6 +1,6 @@
-from .models import User
+from .models import User, PersonalizingInfo
 from rest_framework import serializers, validators
-
+from django.shortcuts import get_object_or_404
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,3 +54,18 @@ class UserNicknameSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('nickname',)
+
+
+class OnboardingUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonalizingInfo
+        fields = '__all__'
+
+    def save(self, requested_data):
+        user = get_object_or_404(User, id=requested_data["user_id"])
+        PersonalizingInfo.objects.create(
+            user=user,
+            # Todo sex,genre가 null값일 때 handling
+            sex=requested_data['sex'],
+            fav_genre_keywords=requested_data['genre']
+        )

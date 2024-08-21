@@ -1,12 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import RegisterSerializer,UserSerializer, UserNicknameSerializer
+from .serializers import RegisterSerializer,UserSerializer, UserNicknameSerializer,OnboardingUpdateSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from .models import User
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
+
+from .selectors.abstracts import UserSelector
+from .services import UserService
 
 import secret
 
@@ -76,6 +79,22 @@ class UserInfoAPIView(APIView):
     def delete(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
         user.delete()
+        return Response(status=status.HTTP_200_OK)
+
+class OnBoardingAPIView(APIView):
+    def post(self, request, user_id):
+        serializer = OnboardingUpdateSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(status=status.HTTP_200_OK)
+
+
+class RecentSearchedAPIView(APIView):
+    def get(self, request, user_id):
+        recent_searched = UserSelector.get_personal_info(user_id=user_id)
+        return Response({"result":recent_searched.recent_search_history}, status=status.HTTP_200_OK)
+
+    def delete(self, request, user_id):
+        UserService(UserSelector).remove_one_history(user_id,request.data["content"])
         return Response(status=status.HTTP_200_OK)
 
 
