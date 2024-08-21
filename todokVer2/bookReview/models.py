@@ -5,10 +5,10 @@ from user.models import User
 # Create your models here.
 class BookReview(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
-    keywords = models.JSONField()
+    keywords = models.JSONField(default=list)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=200)
-    written_at = models.DateTimeField()
+    written_at = models.DateField()
     release_or_not = models.BooleanField(default=False)
 
     class Meta:
