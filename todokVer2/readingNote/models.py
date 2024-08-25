@@ -2,21 +2,21 @@ from django.db import models
 from book.models import Book
 from user.models import User
 
-
-# Create your models here.
-class AIQuestionFinished(models.Model):
-    aiquestion = models.AutoField(primary_key=True)
-    keywords = models.JSONField(default=list)
-    content = models.JSONField(default=list)
+class ExQuestionOngoing(models.Model):
+    exquestion_id = models.AutoField(primary_key=True)
+    genre = models.CharField(max_length=100)
+    content = models.CharField(max_length=100)
 
     class Meta:
         managed = True
-        db_table = 'AIQuestionFinished'
+        db_table = 'ExQuestionOngoing'
 
 
+# Create your models here.
 class ReadingNote(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
-    aiquestion = models.ForeignKey(AIQuestionFinished, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    exquestion = models.ForeignKey(ExQuestionOngoing, on_delete=models.CASCADE, null=True)
     keywords = models.JSONField(default=list)
     sentence = models.CharField(max_length=100)
     sentence_image = models.CharField(max_length=256, blank=True, default="")
@@ -29,14 +29,15 @@ class ReadingNote(models.Model):
         db_table = 'ReadingNote'
 
 
-class UserReadingNote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
-    aiquestion = models.ForeignKey(AIQuestionFinished, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'UserReadingNote'
+# class UserReadingNote(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+#     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
+#     aiquestion = models.ForeignKey(AIQuestionFinished, on_delete=models.CASCADE, null=True)
+#     exquestion = models.ForeignKey(ExQuestionOngoing, on_delete=models.CASCADE, null=True)
+#
+#     class Meta:
+#         managed = True
+#         db_table = 'UserReadingNote'
 
 
 class PreReadingNote(models.Model):
@@ -49,13 +50,3 @@ class PreReadingNote(models.Model):
     class Meta:
         managed = True
         db_table = 'PreReadingNote'
-
-
-class ExQuestionOngoing(models.Model):
-    exquestion = models.AutoField(primary_key=True)
-    genre = models.CharField(max_length=100)
-    content = models.CharField(max_length=100)
-
-    class Meta:
-        managed = True
-        db_table = 'ExQuestionOngoing'

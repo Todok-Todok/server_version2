@@ -57,15 +57,35 @@ class UserNicknameSerializer(serializers.ModelSerializer):
 
 
 class OnboardingUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PersonalizingInfo
-        fields = '__all__'
+    user_id = serializers.IntegerField(
+        help_text="유저 아이디",
+        required=True,
+    )
+    sex = serializers.CharField(
+        help_text="성별",
+        max_length=3,
+        allow_blank=True,
+        required=False,
+    )
+    genre = serializers.JSONField(
+        help_text="관심있는 장르",
+        allow_null=True,
+        required=False,
+    )
+
+    def validate_genre(self, genre):
+        if genre is None:
+            genre = []
+        return genre
 
     def save(self, requested_data):
         user = get_object_or_404(User, id=requested_data["user_id"])
         PersonalizingInfo.objects.create(
             user=user,
-            # Todo sex,genre가 null값일 때 handling
-            sex=requested_data['sex'],
-            fav_genre_keywords=requested_data['genre']
+            sex=requested_data["sex"],
+            fav_genre_keywords=self.validated_data["genre"]
         )
+
+    class Meta:
+        model = PersonalizingInfo
+        fields = ('user_id','genre','sex',)

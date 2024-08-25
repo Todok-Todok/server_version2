@@ -1,6 +1,19 @@
-from .models import Book, UserBook, BookSentence
+from .models import Book, UserBook, BookSentence, BookDetail
+from bookReview.models import BookReview
 from rest_framework import serializers, validators
 from readingNote.selectors.abstracts import ReadingNoteSelector
+from bookReview.serializers import BriefReviewSerializer
+
+class BookDetailSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        bookreview_obj = BookReview.objects.filter(book=instance.book).order_by('?').first()
+        response['book_detail'] = BookSerializer(instance.book).data
+        response['brief_review'] = BriefReviewSerializer(bookreview_obj).data
+        return response
+    class Meta:
+        model = BookDetail
+        fields = ('intro','buying_at',)
 
 class BookSentenceSerializer(serializers.ModelSerializer):
     class Meta:
