@@ -31,17 +31,6 @@ class UserBook(models.Model):
         db_table = 'UserBook'
 
 
-class BriefReview(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
-    brief_review = models.TextField()
-    written_at = models.DateField()
-
-    class Meta:
-        managed = True
-        db_table = 'BriefReview'
-
-
 class BookDetail(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE, null=True)
     intro = models.TextField()

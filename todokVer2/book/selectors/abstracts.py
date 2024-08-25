@@ -18,6 +18,10 @@ class AbstractBookSelector(metaclass=ABCMeta):
     def get_booksentences(self) -> "Queryset[BookSentence]":
         pass
 
+    @abstractmethod
+    def get_book_by_bookid(self) -> Book:
+        pass
+
 class BookSelector(AbstractBookSelector):
     def get_ing_userbooks_by_user_id(user_id: int) -> "Queryset[UserBook]":
         user = get_object_or_404(User, id=user_id)
@@ -32,3 +36,6 @@ class BookSelector(AbstractBookSelector):
 
     def get_booksentences(self) -> "Queryset[BookSentence]":
         return BookSentence.objects.all()
+
+    def get_book_by_bookid(book_id: int) -> Book:
+        return get_object_or_404(Book, book_id=book_id)

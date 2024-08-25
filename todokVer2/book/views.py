@@ -14,6 +14,7 @@ from datetime import date
 KAKAO_REST_API_KEY = secret.KAKAO_REST_API_KEY
 
 # Create your views here.
+# Todo 책 검색 API에서 최근 검색어에 book_name 추가하기 !
 class SearchAPIView(APIView):
     def get(self, request):
         book_name = request.GET['book_name']
@@ -49,8 +50,13 @@ class RecommendBookByGenreAPIView(APIView):
         books_list = BookService(BookSelector).get_recommended_books(user_id=user_id)
         return Response(books_list, status=status.HTTP_200_OK)
 
-
 class BookSentenceAPIView(APIView):
     def get(self, request):
         sentences = BookService(BookSelector).get_all_booksentences()
-        Response({"result":sentences}, status=status.HTTP_200_OK)
+        return Response({"result" : sentences}, status=status.HTTP_200_OK)
+
+class BookDetailAPIView(APIView):
+    def get(self, request, book_id):
+        response = BookService(BookSelector).get_detail_book(book_id=book_id)
+        return Response(response, status=status.HTTP_200_OK)
+

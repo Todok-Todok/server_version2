@@ -53,7 +53,7 @@ class PersonalizingInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     recent_search_history = models.JSONField(default=list)
     fav_genre_keywords = models.JSONField(default=list)
-    sex = models.CharField(max_length=3,default="")     # "F","M","etc" 3가지로 제한
+    sex = models.CharField(max_length=3, default="")     # "F","M","etc" 3가지로 제한
 
     class Meta:
         managed = True

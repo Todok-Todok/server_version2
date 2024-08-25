@@ -82,10 +82,13 @@ class UserInfoAPIView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 class OnBoardingAPIView(APIView):
-    def post(self, request, user_id):
+    def post(self, request):
         serializer = OnboardingUpdateSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.save(request.data)
             return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RecentSearchedAPIView(APIView):
