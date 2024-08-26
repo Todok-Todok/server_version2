@@ -1,7 +1,7 @@
 from .serializers import *
 from .selectors.abstracts import BookSelector
 from typing import List, Dict
-
+from datetime import date
 
 class BookService:
     def __init__(self, selector: BookSelector):
@@ -27,3 +27,33 @@ class BookService:
         bookdetail_obj = BookDetail.objects.get(book=book_obj)
         serializers = BookDetailSerializer(bookdetail_obj)
         return serializers.data
+
+    def get_userbook_detail(self, user_id: int, book_id: int) -> Dict:
+        userbook_obj = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
+        serializers = UserBookDetailSerializer(userbook_obj)
+        return serializers.data
+
+    def save_reading_pages(self,user_id: int, book_id: int, pages: int) -> int:
+        userbook = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
+        entire_pages = userbook.book.entire_pages
+        userbook.reading_pages = pages
+        userbook.reading_percent = pages/entire_pages
+        today_str = str(date.today())
+        reading_days_list = userbook.reading_days
+        if today_str not in reading_days_list:
+            reading_days_list.append(today_str)
+        new_userbook = userbook.save()
+        return new_userbook.reading_percent
+
+    def get_entire_pages(self, user_id: int, book_id: int) -> int:
+        userbook = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
+        return userbook.book.entire_pages
+
+    def remove_userbook(self, user_id: int, book_id: int) -> None:
+        userbook = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
+        userbook.delete()
+
+    def get_all_books(self, user_id: int) -> List:
+        userbooks = self.selector.get_all_userbooks_by_user_id(user_id=user_id)
+        serializer = AllUserBookSerializer(userbooks)
+        return serializer.data

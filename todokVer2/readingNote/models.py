@@ -18,11 +18,10 @@ class ReadingNote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     exquestion = models.ForeignKey(ExQuestionOngoing, on_delete=models.CASCADE, null=True)
     keywords = models.JSONField(default=list)
-    sentence = models.CharField(max_length=100)
     sentence_image = models.CharField(max_length=256, blank=True, default="")
     content = models.CharField(max_length=200)
     written_at = models.DateField()
-    release_or_not = models.BooleanField(default=False)
+    disclosure = models.BooleanField(default=False)  # False : 비공개, True : 공개
 
     class Meta:
         managed = True
@@ -43,9 +42,9 @@ class ReadingNote(models.Model):
 class PreReadingNote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
-    title = models.CharField(max_length=100)
     content = models.CharField(max_length=200)
     written_at = models.DateField()
+    disclosure = models.BooleanField(default=False)  # False : 비공개, True : 공개
 
     class Meta:
         managed = True

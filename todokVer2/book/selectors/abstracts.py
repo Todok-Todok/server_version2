@@ -10,6 +10,11 @@ class AbstractBookSelector(metaclass=ABCMeta):
     @abstractmethod
     def get_ing_userbooks_by_user_id(user_id: int) -> "Queryset[UserBook]":
         pass
+
+    @abstractmethod
+    def get_all_userbooks_by_user_id(user_id: int) -> "Queryset[UserBook]":
+        pass
+
     @abstractmethod
     def get_books_by_fav_genre(user_id: int) -> "Queryset[Book]":
         pass
@@ -22,10 +27,19 @@ class AbstractBookSelector(metaclass=ABCMeta):
     def get_book_by_bookid(self) -> Book:
         pass
 
+    @abstractmethod
+    def get_userbook_detail_by_ids(user_id: int, book_id: int) -> UserBook:
+        pass
+
 class BookSelector(AbstractBookSelector):
     def get_ing_userbooks_by_user_id(user_id: int) -> "Queryset[UserBook]":
         user = get_object_or_404(User, id=user_id)
         book_objects = UserBook.objects.filter(user=user, status=1).order_by("saved_at")
+        return book_objects
+
+    def get_all_userbooks_by_user_id(user_id: int) -> "Queryset[UserBook]":
+        user = get_object_or_404(User, id=user_id)
+        book_objects = UserBook.objects.filter(user=user)
         return book_objects
 
     def get_books_by_fav_genre(user_id: int) -> "Queryset[Book]":
@@ -39,3 +53,8 @@ class BookSelector(AbstractBookSelector):
 
     def get_book_by_bookid(book_id: int) -> Book:
         return get_object_or_404(Book, book_id=book_id)
+
+    def get_userbook_detail_by_ids(user_id: int, book_id: int) -> UserBook:
+        user = get_object_or_404(User, id=user_id)
+        book = get_object_or_404(Book, book_id=book_id)
+        return UserBook.objects.get(user=user, book=book)

@@ -21,8 +21,8 @@ class UserBook(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
     status = models.IntegerField(default=1)  # 1 : 읽는 중 , 그 외 : 0 (기본값)
-    reading_time = models.JSONField(default=dict)
     reading_pages = models.IntegerField(default=0)
+    reading_percent = models.IntegerField(default=0)
     reading_days = models.JSONField(default=list)
     saved_at = models.DateField()
 

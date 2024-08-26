@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import RegisterSerializer,UserSerializer, UserNicknameSerializer,OnboardingUpdateSerializer
+from .serializers import *
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from .models import User
@@ -65,13 +65,13 @@ class UserInfoAPIView(APIView):
     # 유저 정보 확인
     def get(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
-        serializer = UserSerializer(instance=user)
+        serializer = UserProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
-        serializer = UserNicknameSerializer(user)
-        if serializer.is_valid():
+        serializer = UserProfileSerializer(user, data=request.data)
+        if serializer.is_valid(raise_exception=True):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -79,17 +79,33 @@ class UserInfoAPIView(APIView):
     def delete(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
         user.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class OnBoardingAPIView(APIView):
     def post(self, request):
         serializer = OnboardingUpdateSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save(request.data)
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+class MyInfoAPIView(APIView):
+    def get(self, request, user_id):
+        user = UserSelector.get_user_userid(user_id=user_id)
+        return Response({"emal":user.email}, status=status.HTTP_200_OK)
+
+    def post(self, request, user_id):
+        password_type = request.GET.get('type', None)
+        if password_type == 'past':
+            result = UserService(UserSelector).change_password(user_id=user_id,type=0,password=request.data["password"])
+        else:
+            result = UserService(UserSelector).change_password(user_id=user_id,type=1,password=request.data["password"])
+
+        if result is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_200_OK)
 
 class RecentSearchedAPIView(APIView):
     def get(self, request, user_id):
