@@ -6,6 +6,7 @@ urlpatterns = [
     path('register/', views.RegisterAPIView.as_view()),
     path('base/<int:user_id>/', views.UserInfoAPIView.as_view()),
     path('base/login/', views.LoginAPIView.as_view()),
+    path('base/myinfo/<int:user_id>/', views.MyInfoAPIView.as_view()),
     # 소셜로그인
     # 구글
     path('google/callback/', views.google_callback, name='google_callback'),

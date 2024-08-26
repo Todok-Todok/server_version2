@@ -15,3 +15,16 @@ class UserService:
         if content in info_list:
             info_list.remove(content)
         personaling_info.save()
+
+    def change_password(self, user_id: int, type: int, password: str) -> "Optional[str]":
+        user = get_object_or_404(User, id=user_id)
+        # type == 0 : 기존 비밀번호 일치 확인
+        # type == 1 : 새로운 비밀번호로 변경
+        if type == 0:
+            if user.password != password:
+                return None
+        else:
+            user.password = password
+            user.save()
+
+        return password

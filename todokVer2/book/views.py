@@ -60,3 +60,20 @@ class BookDetailAPIView(APIView):
         response = BookService(BookSelector).get_detail_book(book_id=book_id)
         return Response(response, status=status.HTTP_200_OK)
 
+class ReadingPageSaveAPIView(APIView):
+    def post(self, request, user_id, book_id):
+        reading_percent = BookService(BookSelector).save_reading_pages(user_id=user_id, book_id=book_id, pages=request.data["reading_pages"])
+        return Response({"reading_percent":reading_percent}, status=status.HTTP_200_OK)
+    def get(self, request, user_id, book_id):
+        entire_pages = BookService(BookSelector).get_entire_pages(user_id=user_id, book_id=book_id)
+        return Response({"entire_pages":entire_pages}, status=status.HTTP_200_OK)
+
+class UserBookRemoveAPIView(APIView):
+    def delete(self, request, user_id, book_id):
+        BookService(BookSelector).remove_userbook(user_id=user_id, book_id=book_id)
+        return Response(status=status.HTTP_200_OK)
+
+class UserBookAllAPIView(APIView):
+    def get(self, request, user_id):
+        book_list = BookService(BookSelector).get_all_books(user_id=user_id)
+        return Response({"result": book_list}, status=status.HTTP_200_OK)

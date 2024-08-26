@@ -1,6 +1,7 @@
 from .models import User, PersonalizingInfo
 from rest_framework import serializers, validators
 from django.shortcuts import get_object_or_404
+from .selectors.abstracts import UserSelector
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,3 +90,14 @@ class OnboardingUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonalizingInfo
         fields = ('user_id','genre','sex',)
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    sex = serializers.SerializerMethodField()
+
+    def get_sex(self, obj):
+        personalizinguser_obj = UserSelector.get_personal_info(obj.id)
+        return personalizinguser_obj.sex
+
+    class Meta:
+        model = User
+        fields = ('sex','avatar_url','nickname',)

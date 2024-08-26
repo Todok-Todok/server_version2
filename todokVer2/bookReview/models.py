@@ -5,7 +5,7 @@ from user.models import User
 # Create your models here.
 class AIQuestion(models.Model):
     aiquestion_id = models.AutoField(primary_key=True)
-    content = models.JSONField(default=list)
+    aiquestion_list = models.JSONField(default=list)
 
     class Meta:
         managed = True
@@ -20,7 +20,7 @@ class BookReview(models.Model):
     brief_review = models.CharField(max_length=100)
     content = models.CharField(max_length=200)
     written_at = models.DateField()
-    release_or_not = models.BooleanField(default=False)
+    disclosure = models.BooleanField(default=False) # False : 비공개, True : 공개
 
     class Meta:
         managed = True

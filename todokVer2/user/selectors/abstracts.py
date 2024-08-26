@@ -6,7 +6,11 @@ from typing import Dict, Optional, List
 
 class AbstractUserSelector(metaclass=ABCMeta):
     @abstractmethod
-    def get_personal_info(user_id:int) -> List:
+    def get_personal_info(user_id:int) -> PersonalizingInfo:
+        pass
+
+    @abstractmethod
+    def get_user_userid(user_id: int) -> User:
         pass
 
 class UserSelector(AbstractUserSelector):
@@ -14,3 +18,6 @@ class UserSelector(AbstractUserSelector):
         user = get_object_or_404(User, id=user_id)
         personaling_info = PersonalizingInfo.objects.get(user=user)
         return personaling_info
+
+    def get_user_userid(user_id: int) -> User:
+        return get_object_or_404(User, id=user_id)

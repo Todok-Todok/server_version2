@@ -34,6 +34,17 @@ class BookSerializer(serializers.ModelSerializer):
 
         return super().validate(attrs)
 
+
+class UserBookDetailSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response.update(BookSerializer(instance.book).data)
+        return response
+    class Meta:
+        model = UserBook
+        fields = ('reading_pages',)
+
+
 class IngBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
@@ -52,11 +63,31 @@ class IngUserBookSerializer(serializers.ModelSerializer):
 
 class RecommendBookSerializer(serializers.ModelSerializer):
     book_memo = serializers.SerializerMethodField()
-    def __init__(self, selector: ReadingNoteSelector):
-        self.selector = selector
+
     def get_book_memo(self, obj):
-        readingnote_obj = self.selector.get_one_note_by_book(obj)
+        readingnote_obj = ReadingNoteSelector.get_one_note_by_book(obj)
         return readingnote_obj.content
     class Meta:
         model = Book
         fields = ('title','author','keywords','book_image','book_memo',)
+
+
+class MyBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ('book_id','title','book_image','entire_pages',)
+
+
+class AllUserBookSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response.update(MyBookSerializer(instance.book).data)
+        return response
+    class Meta:
+        model = UserBook
+        fields = ('reading_percent',)
+
+class UserBookReviewSimpleSerializser(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ('author','book_image',)
