@@ -93,7 +93,7 @@ class OnBoardingAPIView(APIView):
 class MyInfoAPIView(APIView):
     def get(self, request, user_id):
         user = UserSelector.get_user_userid(user_id=user_id)
-        return Response({"emal":user.email}, status=status.HTTP_200_OK)
+        return Response({"email":user.email}, status=status.HTTP_200_OK)
 
     def post(self, request, user_id):
         password_type = request.GET.get('type', None)

@@ -87,7 +87,18 @@ class AllUserBookSerializer(serializers.ModelSerializer):
         model = UserBook
         fields = ('reading_percent',)
 
-class UserBookReviewSimpleSerializser(serializers.ModelSerializer):
+class UserBookReviewSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ('author','book_image',)
+
+class BookSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ('book_image', 'title',)
+
+
+class BookSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ('book_image','keywords','author','title','genre',)

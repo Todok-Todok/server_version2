@@ -50,12 +50,6 @@ class ReadingNotePatchSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=True,
     )
-    sentence_image = serializers.CharField(
-        help_text="성별",
-        max_length=256,
-        allow_blank=True,
-        required=False,
-    )
     disclosure = serializers.BooleanField(
         help_text="공개/비공개 여부",
         required=True,
@@ -80,12 +74,6 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=True,
     )
-    sentence_image = serializers.CharField(
-        help_text="성별",
-        max_length=256,
-        allow_blank=True,
-        required=False,
-    )
     exquestion_id = serializers.IntegerField(
         help_text="데일리 샘플 질문 id",
         allow_null=True,
@@ -105,10 +93,23 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
             book=book,
             exquestion=requested_data["exquestion_id"],
             keywords=requested_data["keywords"],
-            sentence_image=requested_data["sentence_image"],
             content=requested_data["content"],
             written_at=date.today()
         )
 
     class Meta:
         model = ReadingNote
+
+class ReadingNoteListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReadingNote
+        fields = ('id', 'sample_question','content', 'keywords', 'written_at', 'disclosure',)
+
+class ExtendedReadingNoteListSerializer(ReadingNoteListSerializer):
+    nickname = serializers.SerializerMethodField()
+
+    def get_nickname(self, obj):
+        return obj.user.nickname
+
+    class Meta(ReadingNoteListSerializer.Meta):  # 기존 Meta 클래스 상속
+        fields = ReadingNoteListSerializer.Meta.fields + ('nickname',)  # 새로운 필드를 추가하여 fields 수정

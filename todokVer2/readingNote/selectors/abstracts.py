@@ -36,6 +36,18 @@ class AbstractReadingNoteSelector(metaclass=ABCMeta):
     def get_one_note_by_book(book: Book) -> ReadingNote:
         pass
 
+    @abstractmethod
+    def get_all_userreadingnote(user_id: int, book_id: int) -> "QuerySet[ReadingNote]":
+        pass
+
+    @abstractmethod
+    def get_readingnote_by_readingnote_id(readingnote_id: int) -> ReadingNote:
+        pass
+
+    @abstractmethod
+    def get_readingontes_by_book_id(book_id: int) -> "QuerySet[ReadingNote]":
+        pass
+
 class ReadingNoteSelector(AbstractReadingNoteSelector):
     def get_one_note_by_book(book: Book) -> ReadingNote:
         return ReadingNote.objects.filter(book=book).order_by('?').first()
@@ -64,3 +76,16 @@ class ReadingNoteSelector(AbstractReadingNoteSelector):
         user = get_object_or_404(User, id=user_id)
         book = get_object_or_404(Book, book_id=book_id)
         return PreReadingNote.objects.get(user=user, book=book)
+
+    def get_all_userreadingnote(user_id: int, book_id: int) -> "QuerySet[ReadingNote]":
+        user = get_object_or_404(User, id=user_id)
+        book = get_object_or_404(Book, book_id=book_id)
+        return ReadingNote.objects.filter(user=user, book=book)
+
+    def get_readingnote_by_readingnote_id(readingnote_id: int) -> ReadingNote:
+        readingnote = get_object_or_404(ReadingNote, id=readingnote_id)
+        return readingnote
+
+    def get_readingontes_by_book_id(book_id: int) -> "QuerySet[ReadingNote]":
+        book = get_object_or_404(Book, book_id=book_id)
+        return ReadingNote.objects.filter(book=book)

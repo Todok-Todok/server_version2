@@ -9,6 +9,9 @@ class Book(models.Model):
     book_image = models.CharField(max_length=256, blank=True, default="")
     author = models.CharField(max_length=50)
     publisher = models.CharField(max_length=50)
+    published_at = models.CharField(max_length=100)
+    isbn = models.CharField(max_length=20)
+    table_of_content = models.TextField()
     keywords = models.JSONField(default=list)
     entire_pages = models.IntegerField()
 
@@ -34,7 +37,7 @@ class UserBook(models.Model):
 class BookDetail(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE, null=True)
     intro = models.TextField()
-    buying_at = models.JSONField(default=dict)
+    # buying_at = models.JSONField(default=dict)
 
     class Meta:
         managed = True

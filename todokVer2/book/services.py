@@ -2,6 +2,7 @@ from .serializers import *
 from .selectors.abstracts import BookSelector
 from typing import List, Dict
 from datetime import date
+from django.db import transaction, connection
 
 class BookService:
     def __init__(self, selector: BookSelector):
@@ -57,3 +58,13 @@ class BookService:
         userbooks = self.selector.get_all_userbooks_by_user_id(user_id=user_id)
         serializer = AllUserBookSerializer(userbooks)
         return serializer.data
+
+    def delete_all_books_and_details(self):
+        try:
+            with transaction.atomic():
+                with connection.cursor() as cursor:
+                    cursor.execute("DELETE FROM `todoktodok`.`BookDetail`;")
+                    cursor.execute("DELETE FROM `todoktodok`.`Book`;")
+        except Exception as e:
+            # 예외가 발생하면 자동으로 롤백됨.
+            print(f"An error occurred: {e}")

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     #third party apps
     'rest_framework',
     'rest_framework.authtoken', # Token 인증 세팅
+    # django-filter
+    'django_filters',
     # dj-rest-auth
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -58,6 +60,7 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
