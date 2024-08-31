@@ -18,7 +18,6 @@ class ReadingNote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     exquestion = models.ForeignKey(ExQuestionOngoing, on_delete=models.CASCADE, null=True)
     keywords = models.JSONField(default=list)
-    sentence_image = models.CharField(max_length=256, blank=True, default="")
     content = models.CharField(max_length=200)
     written_at = models.DateField()
     disclosure = models.BooleanField(default=False)  # False : 비공개, True : 공개

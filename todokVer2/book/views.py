@@ -1,32 +1,36 @@
 import secret
-import requests
+import asyncio
+
+from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import BookSerializer
+from rest_framework import filters
+
+from .serializers import BookSerializer, BookSearchSerializer
 from .models import Book, UserBook
-from user.models import User
+from user.models import User, PersonalizingInfo
 from django.shortcuts import get_object_or_404
 from .services import BookService
 from .selectors.abstracts import BookSelector
 from datetime import date
+from .bestseller_book_crawling.crawling import BookCrawler, EachBookCrawler
+from .bestseller_book_crawling.crawling_additional import AdditionalBookCrawler
 
 KAKAO_REST_API_KEY = secret.KAKAO_REST_API_KEY
 
 # Create your views here.
-# Todo 책 검색 API에서 최근 검색어에 book_name 추가하기 !
 class SearchAPIView(APIView):
     def get(self, request):
         book_name = request.GET['book_name']
-        headers = {"Authorization": "KakaoAK "+KAKAO_REST_API_KEY}
-        doc = requests.get(
-            f"https://dapi.kakao.com/v3/search/book?query={book_name}", headers=headers)
-        doc = doc.json()
-        # title #doc['documents'][0]['title']
-        # author #', '.join(doc['documents'][0]['authors'])
-        # book_image #doc['documents'][0]['thumbnail']
-        # publisher #doc['documents'][0]['publisher']
-        return Response(doc, status=status.HTTP_200_OK)
+        book_list = AdditionalBookCrawler().main(book_name)
+        return Response({"result": book_list}, status=status.HTTP_200_OK)
+
+class EachSearchAPIView(APIView):
+    def get(self, request):
+        book_url = request.data['book_url']
+        asyncio.run(EachBookCrawler().get_each_book_info(book_url))
+        return Response(status=status.HTTP_201_CREATED)
 
 class UserBookAPIView(APIView):
     # 읽는 중인 책으로 추가
@@ -77,3 +81,28 @@ class UserBookAllAPIView(APIView):
     def get(self, request, user_id):
         book_list = BookService(BookSelector).get_all_books(user_id=user_id)
         return Response({"result": book_list}, status=status.HTTP_200_OK)
+
+class BookCrawlingAPIView(APIView):
+    def get(self, request):
+        BookCrawler().main()
+        return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        BookService(BookSelector).delete_all_books_and_details()
+        return Response(status=status.HTTP_200_OK)
+
+
+class BookSearchInDBAPIView(ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSearchSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title']
+
+    def list(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        personalizing = PersonalizingInfo.objects.get(user=user)
+
+        book_name = request.GET['search']
+        personalizing.recent_search_history.append(book_name)
+        personalizing.save()

@@ -1,6 +1,7 @@
 from .serializers import *
 from .selectors.abstracts import ReadingNoteSelector
 from book.selectors.abstracts import BookSelector
+from book.serializers import BookSimpleSerializer
 from typing import List, Dict
 
 
@@ -14,7 +15,7 @@ class ReadingNoteService:
         return serializer.data
 
     def patch_readingnote(self, user_id: int, book_id: int) -> ReadingNote:
-        readingnote_obj = self.selector.get_readingnote_by_userbook(user_id=user_id,book_id=book_id)
+        readingnote_obj = self.selector.get_readingnote_by_userbook(user_id=user_id, book_id=book_id)
         return readingnote_obj
 
     def delete_readingnote(self, note_id: int) -> None:
@@ -22,7 +23,7 @@ class ReadingNoteService:
         readingnote_obj.delete()
 
     def get_today_readingnote_list(self, user_id: int, book_id: int) -> List:
-        readingnote_objs = self.selector.get_today_readingnote(user_id=user_id,book_id=book_id)
+        readingnote_objs = self.selector.get_today_readingnote(user_id=user_id, book_id=book_id)
         serializer = SimpleReadingNoteSerializer(readingnote_objs)
         return serializer.data
 
@@ -33,6 +34,28 @@ class ReadingNoteService:
         return serializer.data
 
     def get_prereadingnote(self, user_id: int, book_id: int) -> Dict:
-        prereadingnote_obj = self.selector.get_prereadingnote_by_userbook(user_id=user_id,book_id=book_id)
+        prereadingnote_obj = self.selector.get_prereadingnote_by_userbook(user_id=user_id, book_id=book_id)
         serializer = PreReadingNoteSaveSerializer(prereadingnote_obj)
+        return serializer.data
+
+    def get_simple_book_info_in_ingbook(self, book_id: int) -> Dict:
+        book_obj = BookSelector.get_book_by_bookid(book_id=book_id)
+        book_simple_info = BookSimpleSerializer(book_obj)
+        return book_simple_info.data
+
+    def get_all_readingnote_in_ingbook(self, user_id: int, book_id: int) -> List:
+        readingnotes = self.selector.get_all_userreadingnote(user_id=user_id, book_id=book_id)
+        readingnoteserializer = ReadingNoteListSerializer(readingnotes)
+        return readingnoteserializer.data
+
+
+
+    def get_one_readingnote_in_detail(self, readingnote_id: int) -> Dict:
+        readingnote = self.selector.get_readingnote_by_readingnote_id(readingnote_id=readingnote_id)
+        serializer = ExtendedReadingNoteListSerializer(readingnote)
+        return serializer.data
+
+    def get_readingnotes_by_book(self, book_id: int) -> List:
+        readingnotes = self.selector.get_readingontes_by_book_id(book_id=book_id)
+        serializer = ExtendedReadingNoteListSerializer(readingnotes)
         return serializer.data
