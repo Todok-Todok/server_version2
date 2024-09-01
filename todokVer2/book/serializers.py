@@ -13,7 +13,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
         return response
     class Meta:
         model = BookDetail
-        fields = ('intro','buying_at',)
+        fields = ('intro',)
 
 class BookSentenceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,7 +66,10 @@ class RecommendBookSerializer(serializers.ModelSerializer):
 
     def get_book_memo(self, obj):
         readingnote_obj = ReadingNoteSelector.get_one_note_by_book(obj)
+        if readingnote_obj is None:
+            return None
         return readingnote_obj.content
+
     class Meta:
         model = Book
         fields = ('title','author','keywords','book_image','book_memo',)

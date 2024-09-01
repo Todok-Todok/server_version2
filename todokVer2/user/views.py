@@ -72,6 +72,7 @@ class UserInfoAPIView(APIView):
         user = get_object_or_404(User, id=user_id)
         serializer = UserProfileSerializer(user, data=request.data)
         if serializer.is_valid(raise_exception=True):
+            serializer.save()
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -93,7 +94,7 @@ class OnBoardingAPIView(APIView):
 class MyInfoAPIView(APIView):
     def get(self, request, user_id):
         user = UserSelector.get_user_userid(user_id=user_id)
-        return Response({"email":user.email}, status=status.HTTP_200_OK)
+        return Response({"email": user.email}, status=status.HTTP_200_OK)
 
     def post(self, request, user_id):
         password_type = request.GET.get('type', None)

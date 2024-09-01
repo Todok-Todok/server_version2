@@ -9,17 +9,17 @@ class BookReviewService:
 
     def get_all_briefreviews(self, book_id: int) -> List:
         bookreviews = self.selector.get_BookReview_by_bookid(book_id= book_id)
-        serializers = BriefReviewAllSerializer(bookreviews)
+        serializers = BriefReviewAllSerializer(bookreviews, many=True)
         return serializers.data
 
     def get_all_bookreviews_by_book(self, book_id: int) -> List:
         bookreviews = self.selector.get_BookReview_by_bookid(book_id= book_id)
-        serializers = BookReviewDetailSerializer(bookreviews)
+        serializers = BookReviewDetailSerializer(bookreviews, many=True)
         return serializers.data
 
     def get_all_bookreview_by_user(self, user_id: int) -> List:
         bookreviews = self.selector.get_BookReview_by_user_id(user_id=user_id)
-        serializers = UserBookReviewSerializer(bookreviews)
+        serializers = UserBookReviewSerializer(bookreviews, many=True)
         return serializers.data
 
     def get_each_bookreview_by_review_id(self, user_id: int, review_id: int) -> "Optional[Dict]":

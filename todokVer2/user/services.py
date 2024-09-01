@@ -21,10 +21,10 @@ class UserService:
         # type == 0 : 기존 비밀번호 일치 확인
         # type == 1 : 새로운 비밀번호로 변경
         if type == 0:
-            if user.password != password:
+            if user.check_password(password) is False:
                 return None
         else:
-            user.password = password
+            user.set_password(password)
             user.save()
 
         return password

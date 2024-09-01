@@ -4,7 +4,7 @@ from bookReview.selectors.abstracts import *
 from user.serializers import UserSimpleSerializer
 from datetime import date
 from user.models import User
-from book.models import Book
+from book.models import Book, UserBook
 from django.shortcuts import get_object_or_404
 
 class BriefReviewSerializer(serializers.ModelSerializer):
@@ -35,7 +35,7 @@ class BookReviewDetailSerializer(serializers.ModelSerializer):
         model = BookReview
         fields = ('brief_review','content','written_at','disclosure','nickname',)
 
-class BookReviewSaveSerializer(serializers.ModelSerializer):
+class BookReviewRequestSaveSerializer(serializers.Serializer):
     content = serializers.CharField(
         help_text="서평 내용",
         max_length=200,
@@ -60,6 +60,23 @@ class BookReviewSaveSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False,
     )
+
+    def validate(self, attr):
+        if self.instance is not None:
+            return super().validate(attr)
+
+        user_id = self.context.get('user_id')
+        book_id = self.context.get('book_id')
+
+        user = get_object_or_404(User, id=user_id)
+        book = get_object_or_404(Book, book_id=book_id)
+        userbook = UserBook.objects.get(user=user, book=book)
+
+        if userbook.status == 1:
+            raise serializers.ValidationError("완독 후에만 서평 작성이 가능합니다.")
+
+        return super().validate(attr)
+
     def validate_keywords(self, keywords):
         if keywords is None:
             keywords = []
@@ -74,19 +91,25 @@ class BookReviewSaveSerializer(serializers.ModelSerializer):
         user = get_object_or_404(User, id=user_id)
         book = get_object_or_404(Book, book_id=book_id)
         aiquestion = AIQuestion.objects.create(
-            aiquestion_list=requested_data["aiquestion_list"]
+            aiquestion_list=self.validated_data["aiquestion_list"]
         )
-        BookReview.objects.create(
+        bookreview = BookReview.objects.create(
             user=user,
             book=book,
             aiquestion=aiquestion,
-            keywords=requested_data["keywords"],
-            sentence_image=requested_data["sentence_image"],
+            brief_review=requested_data["brief_review"],
+            keywords=self.validated_data["keywords"],
             content=requested_data["content"],
             written_at=date.today(),
             disclosure=requested_data["disclosure"]
         )
+        return bookreview
 
+    class Meta:
+        model = BookReview
+        fields = ('brief_review','content','disclosure','keywords','aiquestion_list',)
+
+class BookReviewResponseSaveSerializer(serializers.ModelSerializer):
     book_image = serializers.SerializerMethodField()
 
     def get_book_image(self, obj):

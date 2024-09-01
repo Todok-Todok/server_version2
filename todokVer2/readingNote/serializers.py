@@ -27,7 +27,7 @@ class PreReadingNoteSerializer(serializers.ModelSerializer):
 class PreReadingNoteSaveSerializer(serializers.ModelSerializer):
     def save(self, user_id, book_id, requested_data):
         user = get_object_or_404(User, id=user_id)
-        book = get_object_or_404(Book, id=book_id)
+        book = get_object_or_404(Book, book_id=book_id)
         PreReadingNote.objects.create(
             user=user,
             book=book,
@@ -62,6 +62,7 @@ class ReadingNotePatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReadingNote
+        fields = ('content', 'keywords', 'disclosure',)
 
 class ReadingNoteSaveSerializer(serializers.ModelSerializer):
     content = serializers.CharField(
@@ -85,22 +86,37 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
             keywords = []
         return keywords
 
+    def validate_exquestion_id(self, exquestion_id):
+        if exquestion_id is None:
+            return None
+        else:
+            ExQuestionOngoing.objects.get(exquestion_id=exquestion_id)
+
     def save(self, user_id, book_id, requested_data):
         user = get_object_or_404(User, id=user_id)
-        book = get_object_or_404(Book, id=book_id)
+        book = get_object_or_404(Book, book_id=book_id)
         ReadingNote.objects.create(
             user=user,
             book=book,
-            exquestion=requested_data["exquestion_id"],
-            keywords=requested_data["keywords"],
+            exquestion=self.validated_data["exquestion_id"],
+            keywords=self.validated_data["keywords"],
             content=requested_data["content"],
             written_at=date.today()
         )
 
     class Meta:
         model = ReadingNote
+        fields = ('content','keywords','exquestion_id',)
+
 
 class ReadingNoteListSerializer(serializers.ModelSerializer):
+    sample_question = serializers.SerializerMethodField()
+
+    def get_sample_question(self, obj):
+        if obj.exquestion is None:
+            return None
+        return obj.exquestion.content
+
     class Meta:
         model = ReadingNote
         fields = ('id', 'sample_question','content', 'keywords', 'written_at', 'disclosure',)

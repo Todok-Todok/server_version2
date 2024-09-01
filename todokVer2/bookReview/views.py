@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from .serializers import *
@@ -7,24 +8,32 @@ from .services import BookReviewService
 from .selectors.abstracts import BookReviewSelector
 from book.services import BookService
 from book.selectors.abstracts import BookSelector
+from rest_framework.pagination import LimitOffsetPagination
 
 class BookReviewAPIView(APIView):
     def post(self, request, user_id, book_id):
-        serializer = BookReviewSaveSerializer(data=request.data)
+        response_dict = {"user_id": user_id, "book_id": book_id}
+
+        serializer = BookReviewRequestSaveSerializer(data=request.data, context=response_dict)
         if serializer.is_valid(raise_exception=True):
-            serializer.save(user_id, book_id, request.data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            bookreview = serializer.save(user_id, book_id, request.data)
+            serializer_saved = BookReviewResponseSaveSerializer(bookreview)
+            return Response(serializer_saved.data, status=status.HTTP_200_OK)
 
+class BriefReviewAllAPIView(ListAPIView):
+    serializer_class = BriefReviewAllSerializer
+    pagination_class = LimitOffsetPagination
 
-class BriefReviewAllAPIView(APIView):
-    def get(self, request, book_id):
-        brief_reviews = BookReviewService(BookReviewSelector).get_all_briefreviews(book_id=book_id)
-        return Response({"brief_review":brief_reviews}, status=status.HTTP_200_OK)
-
+    def get_queryset(self):
+        book_id = self.kwargs.get('book_id')
+        return BookReviewSelector.get_BookReview_by_bookid(book_id=book_id)
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
 
 class BookReviewDetailAPIView(APIView):
-    def get(self, request, book_id):
-        book_detail_dict = BookService(BookSelector).get_userbook_detail(book_id=book_id)
+    def get(self, request, user_id, book_id):
+        book_detail_dict = BookService(BookSelector).get_userbook_detail(user_id=user_id, book_id=book_id)
         book_reviews = BookReviewService(BookReviewSelector).get_all_bookreviews_by_book(book_id=book_id)
         return Response({"book_detail": book_detail_dict,"book_review":book_reviews}, status=status.HTTP_200_OK)
 

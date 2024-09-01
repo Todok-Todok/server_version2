@@ -17,7 +17,7 @@ PUBLISHER_PATH = '.prod_detail_view_wrap .prod_detail_view_area .col_prod_info .
 BOOK_IMAGE_PATH = '.prod_detail_view_wrap .prod_detail_view_area .col_prod_info.thumb .prod_thumb_swiper_wrap .prod_thumb_list_wrap .prod_thumb_item .blur_img_wrap .portrait_img_box img'   # src 태그
 GENRE_PATH = '.product_detail_area.book_intro .intro_book .intro_category_list .category_list_item .intro_category_link'
 BASIC_INFO_PATH = '.tbl_row_wrap .tbl_row tbody tr'
-BOOK_INFO_PATH = 'product_detail_area .info_text'
+BOOK_INFO_PATH = '.product_detail_area.book_intro .intro_bottom .info_text'
 BOOK_TABLE_OF_CONTENT_PATH = '.product_detail_area.book_contents .auto_overflow_wrap .auto_overflow_contents .auto_overflow_inner .book_contents_list .book_contents_item'
 
 
