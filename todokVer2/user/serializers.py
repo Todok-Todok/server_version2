@@ -98,6 +98,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
         personalizinguser_obj = UserSelector.get_personal_info(obj.id)
         return personalizinguser_obj.sex
 
+    def save(self, *args, **kwargs):
+        # 1. 기본 저장 로직 실행
+        instance = super().save(*args, **kwargs)
+        instance.save()
+        # 2. 추가 로직 실행 (저장 후 수행할 작업)
+        personalizing = PersonalizingInfo.objects.get(user=self._args[0])
+        personalizing.sex = self._kwargs['data']['sex']
+        personalizing.save()
+
     class Meta:
         model = User
         fields = ('sex','avatar_url','nickname',)

@@ -55,6 +55,12 @@ class PersonalizingInfo(models.Model):
     fav_genre_keywords = models.JSONField(default=list)
     sex = models.CharField(max_length=3, default="")     # "F","M","etc" 3가지로 제한
 
+    def save(self, *args, **kwargs):
+        # recent_search_history의 길이를 5로 제한
+        if len(self.recent_search_history) > 5:
+            self.recent_search_history = self.recent_search_history[-5:]
+        super().save(*args, **kwargs)
+
     class Meta:
         managed = True
         db_table = 'PersonalizingInfo'

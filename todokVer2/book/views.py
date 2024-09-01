@@ -6,9 +6,10 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import filters
+from rest_framework.pagination import LimitOffsetPagination
 
-from .serializers import BookSerializer, BookSearchSerializer
-from .models import Book, UserBook
+from .serializers import BookSerializer, BookSearchSerializer, BookSentenceSerializer
+from .models import Book, UserBook, BookSentence
 from user.models import User, PersonalizingInfo
 from django.shortcuts import get_object_or_404
 from .services import BookService
@@ -54,10 +55,14 @@ class RecommendBookByGenreAPIView(APIView):
         books_list = BookService(BookSelector).get_recommended_books(user_id=user_id)
         return Response(books_list, status=status.HTTP_200_OK)
 
-class BookSentenceAPIView(APIView):
-    def get(self, request):
-        sentences = BookService(BookSelector).get_all_booksentences()
-        return Response({"result" : sentences}, status=status.HTTP_200_OK)
+class BookSentenceAPIView(ListAPIView):
+    queryset = BookSentence.objects.all()
+    serializer_class = BookSentenceSerializer
+    pagination_class = LimitOffsetPagination
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
 
 class BookDetailAPIView(APIView):
     def get(self, request, book_id):
@@ -106,3 +111,6 @@ class BookSearchInDBAPIView(ListAPIView):
         book_name = request.GET['search']
         personalizing.recent_search_history.append(book_name)
         personalizing.save()
+
+        response = super().list(request, *args, **kwargs)
+        return response

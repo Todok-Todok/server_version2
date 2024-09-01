@@ -10,17 +10,17 @@ class BookService:
 
     def get_ing_books(self, user_id: int) -> List:
         userbooks = self.selector.get_ing_userbooks_by_user_id(user_id=user_id)
-        serializers = IngUserBookSerializer(userbooks)
+        serializers = IngUserBookSerializer(userbooks, many=True)
         return serializers.data
 
     def get_recommended_books(self, user_id: int) -> List:
         book_queryset = self.selector.get_books_by_fav_genre(user_id=user_id)
-        serializers = RecommendBookSerializer(book_queryset)
+        serializers = RecommendBookSerializer(book_queryset, many=True)
         return serializers.data
 
     def get_all_booksentences(self) -> List:
-        booksentences = self.selector.get_booksentences()
-        serializers = BookSentenceSerializer(booksentences)
+        booksentences = self.selector.get_booksentences(self)
+        serializers = BookSentenceSerializer(booksentences, many=True)
         return serializers.data
 
     def get_detail_book(self, book_id: int) -> Dict:
@@ -38,13 +38,15 @@ class BookService:
         userbook = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
         entire_pages = userbook.book.entire_pages
         userbook.reading_pages = pages
-        userbook.reading_percent = pages/entire_pages
+        userbook.reading_percent = int((pages/entire_pages)*100)
         today_str = str(date.today())
         reading_days_list = userbook.reading_days
         if today_str not in reading_days_list:
             reading_days_list.append(today_str)
-        new_userbook = userbook.save()
-        return new_userbook.reading_percent
+        if pages == entire_pages:
+            userbook.status = 0    # 완독 상태로 바꾸기
+        userbook.save()
+        return userbook.reading_percent
 
     def get_entire_pages(self, user_id: int, book_id: int) -> int:
         userbook = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
@@ -56,7 +58,7 @@ class BookService:
 
     def get_all_books(self, user_id: int) -> List:
         userbooks = self.selector.get_all_userbooks_by_user_id(user_id=user_id)
-        serializer = AllUserBookSerializer(userbooks)
+        serializer = AllUserBookSerializer(userbooks, many=True)
         return serializer.data
 
     def delete_all_books_and_details(self):
