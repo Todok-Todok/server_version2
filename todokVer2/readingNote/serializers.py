@@ -80,6 +80,10 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False,
     )
+    disclosure = serializers.BooleanField(
+        help_text="독서노트 공개 여부",
+        required=True,
+    )
 
     def validate_keywords(self, keywords):
         if keywords is None:
@@ -98,6 +102,7 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
         ReadingNote.objects.create(
             user=user,
             book=book,
+            disclosure=requested_data["disclosure"],
             exquestion=self.validated_data["exquestion_id"],
             keywords=self.validated_data["keywords"],
             content=requested_data["content"],
@@ -106,7 +111,7 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReadingNote
-        fields = ('content','keywords','exquestion_id',)
+        fields = ('disclosure','content','keywords','exquestion_id',)
 
 
 class ReadingNoteListSerializer(serializers.ModelSerializer):
