@@ -1,6 +1,7 @@
 from .serializers import *
 from .selectors.abstracts import BookReviewSelector
 from typing import List, Dict
+from user.models import User
 
 
 class BookReviewService:
