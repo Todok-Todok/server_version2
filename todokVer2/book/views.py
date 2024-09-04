@@ -43,7 +43,7 @@ class UserBookAPIView(APIView):
         else:
             book = get_object_or_404(Book,title=request.data["title"])
         userbook = UserBook.objects.create(user=user,book=book,saved_at=date.today())
-        return Response(status=status.HTTP_201_CREATED)
+        return Response({"book_id": book.book_id}, status=status.HTTP_201_CREATED)
 
     # 읽는 중인 책 불러오기
     def get(self, request, user_id):
