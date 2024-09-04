@@ -34,17 +34,10 @@ class ReadingNoteCRUDAPIView(APIView):
             serializer.save(user_id, book_id, request.data)
             return Response(status=status.HTTP_200_OK)
 
-class TodayReadingNoteAPIView(ListAPIView):
-    serializer_class = SimpleReadingNoteSerializer
-    pagination_class = LimitOffsetPagination
-
-    def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
-        book_id = self.kwargs.get('book_id')
-        return ReadingNoteSelector.get_today_readingnote(user_id=user_id, book_id=book_id)
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        return response
+class TodayReadingNoteAPIView(APIView):
+    def get(self, request, user_id, book_id):
+        readingnotes = ReadingNoteService(ReadingNoteSelector).get_today_readingnote_list(user_id=user_id, book_id=book_id)
+        return Response({"results": readingnotes}, status=status.HTTP_200_OK)
 
 class TodaySampleQuestionAPIView(APIView):
     def get(self, request, book_id):
