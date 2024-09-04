@@ -48,7 +48,7 @@ class UserBookDetailSerializer(serializers.ModelSerializer):
 class IngBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ('title','author','book_image','entire_pages',)
+        fields = ('book_id','title','author','book_image','entire_pages',)
 
 
 class IngUserBookSerializer(serializers.ModelSerializer):
