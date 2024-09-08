@@ -99,7 +99,7 @@ emotion_questions = {
 }
 
 # 감정 분석을 바탕으로 질문 생성
-def generate_questions(text, top_n=3):
+def generate_questions(text: str, top_n: int = 3) -> List[str]:
     pipe_output = pipe(text)[0]
     
     # 상위 N개의 감정 레이블 추출

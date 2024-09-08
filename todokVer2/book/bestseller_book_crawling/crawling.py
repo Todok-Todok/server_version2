@@ -10,6 +10,8 @@ import concurrent.futures
 from asgiref.sync import sync_to_async
 from django.db import transaction
 
+from book.ai.services import extract_keywords
+
 CRAWLING_URL = 'https://product.kyobobook.co.kr/KOR'   # 국내도서 section
 # 책 제목, 저자, 출판사, 책 소개, 전체 페이지 수, 표지 url, 장르, isbn, 출판일, 목차
 TITLE_PATH = '.prod_detail_title_wrap .prod_title_area .prod_title_box .prod_title'
@@ -18,7 +20,7 @@ PUBLISHER_PATH = '.prod_detail_view_wrap .prod_detail_view_area .col_prod_info .
 BOOK_IMAGE_PATH = '.prod_detail_view_wrap .prod_detail_view_area .col_prod_info.thumb .prod_thumb_swiper_wrap .prod_thumb_list_wrap .prod_thumb_item .blur_img_wrap .portrait_img_box img'   # src 태그
 GENRE_PATH = '.product_detail_area.book_intro .intro_book .intro_category_list .category_list_item .intro_category_link'
 BASIC_INFO_PATH = '.tbl_row_wrap .tbl_row tbody tr'
-BOOK_INFO_PATH = '.product_detail_area.book_intro .intro_bottom .info_text'
+BOOK_INFO_PATH = '.product_detail_area.book_intro .intro_bottom .info_text:not(.fw_bold)'
 BOOK_TABLE_OF_CONTENT_PATH = '.product_detail_area.book_contents .auto_overflow_wrap .auto_overflow_contents .auto_overflow_inner .book_contents_list .book_contents_item'
 
 
@@ -150,6 +152,9 @@ class EachBookCrawler:
         except NoSuchElementException:
             book_image = ""
 
+        # 책 소개 기반 키워드 추출
+        keywords = extract_keywords(intro)
+
         # 트랜잭션을 사용하여 데이터베이스 작업을 원자적으로 처리
         # 중복된 데이터가 저장되는 것을 방지
         def db_operations():
@@ -163,6 +168,7 @@ class EachBookCrawler:
                     isbn=isbn,
                     published_at=published_at,
                     table_of_content=table_of_content,
+                    keywords=keywords,
                     entire_pages=entire_pages,
                     book_image=book_image)
                 serializer = BookSerializer(data=book_data_dict)

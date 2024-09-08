@@ -5,6 +5,11 @@ from user.models import User
 from book.models import Book
 from django.shortcuts import get_object_or_404
 
+class ReadingNoteContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReadingNote
+        fields = ('content',)
+
 class SimpleReadingNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReadingNote

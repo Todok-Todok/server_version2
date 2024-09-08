@@ -116,7 +116,7 @@ class BookReviewResponseSaveSerializer(serializers.ModelSerializer):
         return obj.book.book_image
     class Meta:
         model = BookReview
-        fields = ('brief_review','written_at','book_image',)
+        fields = ('bookreview_id','brief_review','written_at','book_image',)
 
 class UserBookReviewSerializer(serializers.ModelSerializer):
     book_image = serializers.SerializerMethodField()
