@@ -3,6 +3,7 @@ import os
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from book.models import Book, BookDetail
+from book.serializers import BookSerializer
 from .thread_local import ThreadLocalService
 import asyncio
 import concurrent.futures
@@ -154,7 +155,7 @@ class EachBookCrawler:
         def db_operations():
             with transaction.atomic():
                 # 데이터베이스에 저장하는 작업을 비동기적으로 처리
-                book = Book.objects.create(
+                book_data_dict = dict(
                     title=title,
                     author=author,
                     publisher=publisher,
@@ -163,12 +164,14 @@ class EachBookCrawler:
                     published_at=published_at,
                     table_of_content=table_of_content,
                     entire_pages=entire_pages,
-                    book_image=book_image
-                )
-                BookDetail.objects.create(
-                    book=book,
-                    intro=intro
-                )
+                    book_image=book_image)
+                serializer = BookSerializer(data=book_data_dict)
+                if serializer.is_valid():  # 유효성 검사 (책 중복 저장 방지)
+                    book = serializer.save()  # 저장
+                    BookDetail.objects.create(
+                        book=book,
+                        intro=intro
+                    )
         await sync_to_async(db_operations)()
 
         self.thread_local_service.quit_driver()
