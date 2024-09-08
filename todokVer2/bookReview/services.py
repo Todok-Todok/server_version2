@@ -44,8 +44,8 @@ class BookReviewService:
         return generate_questions(combined_text)
 
     def get_recommended_reviews_by_keywords(self, review_id: int) -> Dict[str:List[str], str:List]:
-        my_keywords, all_keywords_list = self.selector.get_allBookReviewKeywords_by_review_id(review_id=review_id)
-        recommended_keywords = find_similar_keywords(my_keywords, all_keywords_list)
+        bookreview, all_keywords_list = self.selector.get_allBookReviewKeywords_by_review_id(review_id=review_id)
+        recommended_keywords = find_similar_keywords(bookreview.book.keywords, all_keywords_list)
 
         bookreviews = self.selector.get_reviews_by_keywords(keywords=recommended_keywords)
         serializer = UserBookReviewSerializer(bookreviews, many=True)
