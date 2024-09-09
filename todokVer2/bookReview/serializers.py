@@ -123,12 +123,12 @@ class UserBookReviewSerializer(serializers.ModelSerializer):
     def get_book_image(self, obj):
         return obj.book.book_image
 
-    def get_author(self, obj):
-        return obj.book.author
+    def get_title(self, obj):
+        return obj.book.title
 
     class Meta:
         model = BookReview
-        fields = ('bookreview_id','brief_review','written_at','book_image','author',)
+        fields = ('bookreview_id','brief_review','written_at','book_image','title',)
 
 
 class EachReviewSerializer(serializers.ModelSerializer):

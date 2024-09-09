@@ -27,7 +27,9 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     # 가장 유사한 서평의 키워드에서 내 서평의 키워드를 제외
     most_similar_keywords = [word for word in all_review_keywords[most_similar_index] if word not in keywords]
 
-    all_keywords_str = ' '.join(most_similar_keywords)
+    # 입력된 키워드와 가장 유사한 키워드를 포함한 모든 키워드 중에서 TF-IDF 점수를 다시 계산하여 상위 3개를 선택
+    all_keywords = keywords + most_similar_keywords
+    all_keywords_str = ' '.join(all_keywords)
     all_tfidf_matrix = tfidf.fit_transform([all_keywords_str])
 
     # 중요도에 따라 상위 n개의 키워드 추출 (내 서평 키워드를 제외한 키워드 중에서 추출)
