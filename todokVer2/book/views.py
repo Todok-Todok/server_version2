@@ -17,6 +17,7 @@ from .selectors.abstracts import BookSelector
 from datetime import date
 from .bestseller_book_crawling.crawling import BookCrawler, EachBookCrawler
 from .bestseller_book_crawling.crawling_additional import AdditionalBookCrawler
+from .ai.services import extract_keywords
 
 KAKAO_REST_API_KEY = secret.KAKAO_REST_API_KEY
 
@@ -114,3 +115,8 @@ class BookSearchInDBAPIView(ListAPIView):
 
         response = super().list(request, *args, **kwargs)
         return response
+
+class KeywordsExtractingAPIView(APIView):
+    def get(self, request):
+        keywords_list = extract_keywords(request.data["review_content"])
+        return Response({"keywords": keywords_list}, status=status.HTTP_200_OK)

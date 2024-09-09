@@ -4,9 +4,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import string
 from konlpy.tag import Komoran
+import os
+
+# 현재 스크립트 파일의 디렉토리 위치를 기준으로 상대 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(current_dir, 'korean_stopwords.txt')
 
 # Stopwords 로드
-with open('korean_stopwords.txt', 'r') as f:
+with open(file_path, 'r') as f:
     list_file = f.readlines()
 stopwords = list([item.strip() for item in list_file])
 stopwords.extend(['나는', '작가', '저자', '주인공', '독서', '문장', '내용', '이제', '오늘', '올해'])

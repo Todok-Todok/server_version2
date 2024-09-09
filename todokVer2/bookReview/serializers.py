@@ -38,7 +38,6 @@ class BookReviewDetailSerializer(serializers.ModelSerializer):
 class BookReviewRequestSaveSerializer(serializers.Serializer):
     content = serializers.CharField(
         help_text="서평 내용",
-        max_length=200,
         required=True,
     )
     keywords = serializers.JSONField(
@@ -116,7 +115,7 @@ class BookReviewResponseSaveSerializer(serializers.ModelSerializer):
         return obj.book.book_image
     class Meta:
         model = BookReview
-        fields = ('brief_review','written_at','book_image',)
+        fields = ('bookreview_id','brief_review','written_at','book_image',)
 
 class UserBookReviewSerializer(serializers.ModelSerializer):
     book_image = serializers.SerializerMethodField()

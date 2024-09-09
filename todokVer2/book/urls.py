@@ -12,5 +12,6 @@ urlpatterns = [
     path('save/<int:user_id>/<int:book_id>/', views.ReadingPageSaveAPIView.as_view()),
     path('<int:user_id>/<int:book_id>/', views.UserBookRemoveAPIView.as_view()),
     path('all/<int:user_id>/', views.UserBookAllAPIView.as_view()),
-    path('crawling/', views.BookCrawlingAPIView.as_view())
+    path('crawling/', views.BookCrawlingAPIView.as_view()),
+    path('keywords/', views.KeywordsExtractingAPIView.as_view())
 ]

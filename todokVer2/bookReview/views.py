@@ -54,3 +54,13 @@ class EachBookReviewAPIView(APIView):
         review = BookReview.objects.get(bookreview_id=review_id)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class GenerateAIQuestionsAPIView(APIView):
+    def get(self, request, user_id, book_id):
+        aiquestions_list = BookReviewService(BookReviewSelector).get_aiquestions(user_id=user_id, book_id=book_id)
+        return Response({"aiquestions": aiquestions_list},status=status.HTTP_200_OK)
+
+class RecommendReviewsAPIView(APIView):
+    def get(self, request, review_id):
+        response_dict = BookReviewService(BookReviewSelector).get_recommended_reviews_by_keywords(review_id=review_id)
+        return Response(response_dict, status=status.HTTP_200_OK)

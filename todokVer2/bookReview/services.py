@@ -1,7 +1,11 @@
 from .serializers import *
 from .selectors.abstracts import BookReviewSelector
+from readingNote.selectors.abstracts import ReadingNoteSelector
+from readingNote.serializers import ReadingNoteContentSerializer
 from typing import List, Dict
 from user.models import User
+
+from .ai.services import find_similar_keywords, generate_questions
 
 
 class BookReviewService:
@@ -31,3 +35,22 @@ class BookReviewService:
             return serializer.data
         else:
             return None
+
+    def get_aiquestions(self, user_id: int, book_id: int) -> List[str]:
+        readingnotes_objs = ReadingNoteSelector.get_all_userreadingnote(user_id=user_id, book_id=book_id)
+        readingnotes_list = ReadingNoteContentSerializer(readingnotes_objs, many=True)
+        content_list = []
+        for readingnotes in readingnotes_list.data:
+            content_list.append(readingnotes['content'])
+
+        # 각 요소 사이에 '\n'을 넣어 하나의 문자열로 합치기
+        combined_text = '\n'.join(content_list)
+        return generate_questions(combined_text)
+
+    def get_recommended_reviews_by_keywords(self, review_id: int) -> Dict[str:List[str], str:List]:
+        bookreview, all_keywords_list = self.selector.get_allBookReviewKeywords_by_review_id(review_id=review_id)
+        recommended_keywords, most_similar_keywords = find_similar_keywords(keywords=bookreview.book.keywords, all_review_keywords=list(all_keywords_list))
+        print(recommended_keywords)
+        bookreviews = self.selector.get_reviews_by_keywords(keywords=recommended_keywords)
+        serializer = UserBookReviewSerializer(bookreviews, many=True)
+        return {"keywords": most_similar_keywords, "reviews": serializer.data}
