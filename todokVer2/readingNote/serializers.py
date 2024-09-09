@@ -47,7 +47,6 @@ class PreReadingNoteSaveSerializer(serializers.ModelSerializer):
 class ReadingNotePatchSerializer(serializers.ModelSerializer):
     content = serializers.CharField(
         help_text="독서메모 내용",
-        max_length=200,
         required=True,
     )
     keywords = serializers.JSONField(
@@ -72,7 +71,6 @@ class ReadingNotePatchSerializer(serializers.ModelSerializer):
 class ReadingNoteSaveSerializer(serializers.ModelSerializer):
     content = serializers.CharField(
         help_text="독서메모 내용",
-        max_length=200,
         required=True,
     )
     keywords = serializers.JSONField(

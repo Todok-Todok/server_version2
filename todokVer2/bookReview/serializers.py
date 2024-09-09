@@ -38,7 +38,6 @@ class BookReviewDetailSerializer(serializers.ModelSerializer):
 class BookReviewRequestSaveSerializer(serializers.Serializer):
     content = serializers.CharField(
         help_text="서평 내용",
-        max_length=200,
         required=True,
     )
     keywords = serializers.JSONField(

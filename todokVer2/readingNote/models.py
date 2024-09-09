@@ -18,7 +18,7 @@ class ReadingNote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     exquestion = models.ForeignKey(ExQuestionOngoing, on_delete=models.CASCADE, null=True)
     keywords = models.JSONField(default=list)
-    content = models.CharField(max_length=200)
+    content = models.TextField()
     written_at = models.DateField()
     disclosure = models.BooleanField(default=False)  # False : 비공개, True : 공개
 

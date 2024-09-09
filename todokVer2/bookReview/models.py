@@ -18,7 +18,7 @@ class BookReview(models.Model):
     aiquestion = models.OneToOneField(AIQuestion, on_delete=models.CASCADE, null=True)
     keywords = models.JSONField(default=list)
     brief_review = models.CharField(max_length=100)
-    content = models.CharField(max_length=200)
+    content = models.TextField()
     written_at = models.DateField()
     disclosure = models.BooleanField(default=False) # False : 비공개, True : 공개
 
