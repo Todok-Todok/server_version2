@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import List
+from typing import List, Tuple
 
 def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[str]], top_n: int = 3) -> List[str]:
     # 키워드 리스트를 문자열로 결합
@@ -34,7 +34,8 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     top_indices = np.argpartition(all_tfidf_matrix[0, :].toarray().ravel(), -top_n)[-top_n:]
     top_keywords = feature_names[top_indices].tolist()
 
-    return top_keywords
+    # 입력 키워드와 유사한 상위 키워드를 튜플로 리턴
+    return top_keywords, most_similar_keywords
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TextClassificationPipeline
