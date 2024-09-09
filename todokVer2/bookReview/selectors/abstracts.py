@@ -43,7 +43,7 @@ class BookReviewSelector(AbstractBookReviewSelector):
 
     def get_allBookReviewKeywords_by_review_id(review_id: int) -> Tuple[BookReview, List[List[str]]]:
         bookreview = BookReview.objects.get(bookreview_id=review_id)
-        return bookreview, BookReview.objects.filter(book=bookreview.book).values_list("keywords", flat=True)
+        return bookreview, BookReview.objects.filter(book=bookreview.book).exclude(bookreview_id=review_id).values_list("keywords", flat=True)
 
     def get_reviews_by_keywords(keywords: List[str]) -> "QuerySet[BookReview]":
         if not keywords:

@@ -119,7 +119,7 @@ class BookReviewResponseSaveSerializer(serializers.ModelSerializer):
 
 class UserBookReviewSerializer(serializers.ModelSerializer):
     book_image = serializers.SerializerMethodField()
-    author = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
     def get_book_image(self, obj):
         return obj.book.book_image
 

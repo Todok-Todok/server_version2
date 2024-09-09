@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Tuple
 
-def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[str]], top_n: int = 3) -> Tuple[List[str], List[str]]:
+def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[str]], top_n: int = 3) -> List[str]:
     # 키워드 리스트를 문자열로 결합
     keywords_str = ' '.join(keywords)
 
@@ -21,18 +21,15 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     # 유사도가 가장 높은 서평의 인덱스 찾기
     most_similar_index = cosine_similarities.argmax()
 
-    # 가장 유사한 서평에서 내 서평의 단어와 겹치는 키워드 추출
-    used_keywords = list(set(keywords).intersection(set(all_review_keywords[most_similar_index])))
-
-    # 가장 유사한 서평의 키워드에서 내 서평의 키워드를 제외
-    most_similar_keywords = [word for word in all_review_keywords[most_similar_index] if word not in keywords]
+    # 가장 유사한 서평의 키워드 가져오기
+    most_similar_keywords = all_review_keywords[most_similar_index]
 
     # 입력된 키워드와 가장 유사한 키워드를 포함한 모든 키워드 중에서 TF-IDF 점수를 다시 계산하여 상위 3개를 선택
     all_keywords = keywords + most_similar_keywords
     all_keywords_str = ' '.join(all_keywords)
     all_tfidf_matrix = tfidf.fit_transform([all_keywords_str])
 
-    # 중요도에 따라 상위 n개의 키워드 추출 (내 서평 키워드를 제외한 키워드 중에서 추출)
+    # 중요도에 따라 상위 n개의 키워드 추출
     feature_names = np.array(tfidf.get_feature_names_out())
     feature_vector = all_tfidf_matrix[0, :].toarray().ravel()
 
@@ -41,8 +38,7 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     top_indices = np.argpartition(feature_vector, -top_n)[-top_n:]
     top_keywords = feature_names[top_indices].tolist()
 
-    # 유사한 키워드와 내 서평에서 사용된 키워드를 튜플로 반환
-    return top_keywords, used_keywords
+    return top_keywords
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TextClassificationPipeline
