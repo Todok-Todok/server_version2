@@ -109,4 +109,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('sex','avatar_url','nickname',)
+        fields = ('sex','avatar_url','nickname',"email",)
