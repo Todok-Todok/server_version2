@@ -49,8 +49,8 @@ class BookReviewService:
 
     def get_recommended_reviews_by_keywords(self, review_id: int) -> Dict[str:List[str], str:List]:
         bookreview, all_keywords_list = self.selector.get_allBookReviewKeywords_by_review_id(review_id=review_id)
-        recommended_keywords, most_similar_keywords = find_similar_keywords(keywords=bookreview.book.keywords, all_review_keywords=list(all_keywords_list))
+        recommended_keywords = find_similar_keywords(keywords=bookreview.book.keywords, all_review_keywords=list(all_keywords_list))
         print(recommended_keywords)
         bookreviews = self.selector.get_reviews_by_keywords(keywords=recommended_keywords)
         serializer = UserBookReviewSerializer(bookreviews, many=True)
-        return {"keywords": most_similar_keywords, "reviews": serializer.data}
+        return {"keywords": recommended_keywords, "reviews": serializer.data}
