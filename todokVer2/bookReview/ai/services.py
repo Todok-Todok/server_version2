@@ -34,8 +34,10 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     top_indices = np.argpartition(all_tfidf_matrix[0, :].toarray().ravel(), -top_n)[-top_n:]
     top_keywords = feature_names[top_indices].tolist()
 
+    result = (top_keywords, most_similar_keywords)
+
     # 입력 키워드와 유사한 상위 키워드를 튜플로 리턴
-    return top_keywords, most_similar_keywords
+    return result
 
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TextClassificationPipeline
