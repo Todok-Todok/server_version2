@@ -28,7 +28,6 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     most_similar_keywords = all_review_keywords[most_similar_index]
 
     # 입력된 키워드와 가장 유사한 키워드를 포함한 모든 키워드 중에서 TF-IDF 점수를 다시 계산하여 상위 3개를 선택
-    all_keywords = keywords + most_similar_keywords
     all_keywords_str = ' '.join(all_keywords)
     all_tfidf_matrix = tfidf.fit_transform([all_keywords_str])
 
@@ -40,7 +39,8 @@ def find_similar_keywords(keywords: List[str], all_review_keywords: List[List[st
     top_n = min(3, feature_vector.shape[0])
     top_indices = np.argpartition(feature_vector, -top_n)[-top_n:]
     top_keywords = feature_names[top_indices].tolist()
-
+    
+    # 입력 키워드와 유사한 서평에서 사용된 키워드를 튜플로 리턴
     return top_keywords, used_keywords
 
 
