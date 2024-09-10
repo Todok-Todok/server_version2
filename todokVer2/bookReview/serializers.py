@@ -120,16 +120,33 @@ class BookReviewResponseSaveSerializer(serializers.ModelSerializer):
 class UserBookReviewSerializer(serializers.ModelSerializer):
     book_image = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
+    book_id = serializers.SerializerMethodField()
+
     def get_book_image(self, obj):
         return obj.book.book_image
 
     def get_title(self, obj):
         return obj.book.title
 
+    def get_book_id(self, obj):
+        return obj.book.book_id
+
     class Meta:
         model = BookReview
-        fields = ('bookreview_id','brief_review','written_at','book_image','title',)
+        fields = ('bookreview_id','brief_review','written_at','book_image','title','book_id',)
 
+class ExtendedBookReviewSerializer(UserBookReviewSerializer):
+    user_id = serializers.SerializerMethodField()
+    book_id = serializers.SerializerMethodField()
+
+    def get_user_id(self, obj):
+        return obj.user.id
+
+    def get_book_id(self, obj):
+        return obj.book.book_id
+
+    class Meta(UserBookReviewSerializer.Meta):  # 기존 Meta 클래스 상속
+        fields = UserBookReviewSerializer.Meta.fields + ('user_id','book_id',)  # 새로운 필드를 추가하여 fields 수정
 
 class EachReviewSerializer(serializers.ModelSerializer):
     aiquestion_list = serializers.SerializerMethodField()

@@ -6,9 +6,12 @@ from book.models import Book
 from user.models import User
 from typing import List, Tuple
 from django.db.models import Q
-import random
 
 class AbstractBookReviewSelector(metaclass=ABCMeta):
+    @abstractmethod
+    def get_BookReview_by_users(user_id: int, opponent_user_id: int, book_id: int) -> "Optional[QuerySet[BookReview]]":
+        pass
+
     @abstractmethod
     def get_BookReview_by_bookid(book_id: int) -> "QuerySet[BookReview]":
         pass
@@ -30,6 +33,16 @@ class AbstractBookReviewSelector(metaclass=ABCMeta):
         pass
 
 class BookReviewSelector(AbstractBookReviewSelector):
+    def get_BookReview_by_users(user_id: int, opponent_user_id: int, book_id: int) -> "Optional[QuerySet[BookReview]]":
+        user = get_object_or_404(User, id=user_id)
+        opponent_user = get_object_or_404(User, id=opponent_user_id)
+        book = get_object_or_404(Book, book_id=book_id)
+
+        if user == opponent_user:
+            return BookReview.objects.filter(user=user, book=book)
+        else:
+            return BookReview.objects.filter(user=opponent_user, book=book, disclosure=True)
+
     def get_BookReview_by_bookid(book_id: int) -> "QuerySet[BookReview]":
         book = get_object_or_404(Book, book_id=book_id)
         return BookReview.objects.filter(book=book)

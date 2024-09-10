@@ -9,8 +9,8 @@ class ReadingNoteService:
     def __init__(self, selector: ReadingNoteSelector):
         self.selector = selector
 
-    def get_prereading_note_with_bookdetail(self, book_id: int) -> List:
-        prereading_objs = self.selector.get_prereadingnotes_by_bookid(book_id=book_id)
+    def get_prereading_note_with_bookdetail(self, user_id: int, opponent_user_id: int, book_id: int) -> List:
+        prereading_objs = self.selector.get_prereadingnotes_by_bookid(user_id=user_id, opponent_user_id=opponent_user_id, book_id=book_id)
         serializer = PreReadingNoteSerializer(prereading_objs, many=True)
         return serializer.data
 
@@ -53,9 +53,4 @@ class ReadingNoteService:
     def get_one_readingnote_in_detail(self, readingnote_id: int) -> Dict:
         readingnote = self.selector.get_readingnote_by_readingnote_id(readingnote_id=readingnote_id)
         serializer = ExtendedReadingNoteListSerializer(readingnote)
-        return serializer.data
-
-    def get_readingnotes_by_book(self, book_id: int) -> List:
-        readingnotes = self.selector.get_readingontes_by_book_id(book_id=book_id)
-        serializer = ExtendedReadingNoteListSerializer(readingnotes)
         return serializer.data

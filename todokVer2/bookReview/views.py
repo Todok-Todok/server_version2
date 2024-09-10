@@ -32,9 +32,9 @@ class BriefReviewAllAPIView(ListAPIView):
         return response
 
 class BookReviewDetailAPIView(APIView):
-    def get(self, request, user_id, book_id):
+    def get(self, request, user_id, opponent_user_id, book_id):
         book_detail_dict = BookService(BookSelector).get_userbook_detail(user_id=user_id, book_id=book_id)
-        book_reviews = BookReviewService(BookReviewSelector).get_all_bookreviews_by_book(book_id=book_id)
+        book_reviews = BookReviewService(BookReviewSelector).get_all_bookreviews_by_book(user_id=user_id, opponent_user_id=opponent_user_id, book_id=book_id)
         return Response({"book_detail": book_detail_dict,"book_review":book_reviews}, status=status.HTTP_200_OK)
 
 class UserBookReviewListAPIView(APIView):
@@ -54,6 +54,13 @@ class EachBookReviewAPIView(APIView):
         review = BookReview.objects.get(bookreview_id=review_id)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, user_id, review_id):
+        review = BookReview.objects.get(bookreview_id=review_id)
+        serializer = EachReviewSerializer(review, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
 
 class GenerateAIQuestionsAPIView(APIView):
     def get(self, request, user_id, book_id):
