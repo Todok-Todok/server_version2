@@ -25,10 +25,9 @@ class RegisterAPIView(APIView):
                 {
                     #"user": serializer.data,
                     #"message": "register successs",
-                    "token": token.key,
+                    "user_id": user.id,
                 },
-                status=status.HTTP_200_OK,
-            )
+                status=status.HTTP_200_OK)
             return res
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -53,10 +52,9 @@ class LoginAPIView(APIView):
                 {
                     #"user": serializer.data,
                     #"message": "login success",
-                    "token": token.key,
+                    "user_id": user.id
                 },
-                status=status.HTTP_200_OK,
-            )
+                status=status.HTTP_200_OK)
             return res
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

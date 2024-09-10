@@ -15,9 +15,9 @@ from rest_framework.pagination import LimitOffsetPagination
 
 # Create your views here.
 class PreReadingNoteListAPIView(APIView):
-    def get(self, request, user_id, book_id):
+    def get(self, request, user_id, opponent_user_id, book_id):
         book_detail_dict = BookService(BookSelector).get_userbook_detail(user_id=user_id, book_id=book_id)
-        prereading_note_list = ReadingNoteService(ReadingNoteSelector).get_prereading_note_with_bookdetail(book_id=book_id)
+        prereading_note_list = ReadingNoteService(ReadingNoteSelector).get_prereading_note_with_bookdetail(user_id=user_id, opponent_user_id=opponent_user_id, book_id=book_id)
         return Response({"book_detail": book_detail_dict, "pre-reading_note": prereading_note_list}, status=status.HTTP_200_OK)
 
 class ReadingNoteCRUDAPIView(APIView):
@@ -78,11 +78,12 @@ class OngoingReadingNoteAPIView(ListAPIView):
     search_fields = ['keywords__icontains']
     def list(self, request, *args, **kwargs):
         user_id = self.kwargs.get('user_id')
+        opponent_user_id = self.kwargs.get('opponent_user_id')
         book_id = self.kwargs.get('book_id')
 
         book_detail_dict = BookService(BookSelector).get_userbook_detail(user_id=user_id, book_id=book_id)
 
-        readingnotes = ReadingNoteSelector.get_readingontes_by_book_id(book_id=book_id)
+        readingnotes = ReadingNoteSelector.get_readingnotes_by_book_id(user_id=user_id, opponent_user_id=opponent_user_id, book_id=book_id)
         reading_note_list = self.filter_queryset(readingnotes)  # 검색 필터 적용
         serializer = self.get_serializer(reading_note_list, many=True)
         return Response({"book_detail": book_detail_dict, "reading_note":serializer.data}, status=status.HTTP_200_OK)

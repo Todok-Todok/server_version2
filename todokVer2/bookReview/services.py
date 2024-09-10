@@ -17,8 +17,8 @@ class BookReviewService:
         serializers = BriefReviewAllSerializer(bookreviews, many=True)
         return serializers.data
 
-    def get_all_bookreviews_by_book(self, book_id: int) -> List:
-        bookreviews = self.selector.get_BookReview_by_bookid(book_id= book_id)
+    def get_all_bookreviews_by_book(self, user_id: int, opponent_user_id: int, book_id: int) -> List:
+        bookreviews = self.selector.get_BookReview_by_users(user_id=user_id, opponent_user_id=opponent_user_id, book_id= book_id)
         serializers = BookReviewDetailSerializer(bookreviews, many=True)
         return serializers.data
 
@@ -50,7 +50,6 @@ class BookReviewService:
     def get_recommended_reviews_by_keywords(self, review_id: int) -> Dict[str:List[str], str:List]:
         bookreview, all_keywords_list = self.selector.get_allBookReviewKeywords_by_review_id(review_id=review_id)
         recommended_keywords = find_similar_keywords(keywords=bookreview.book.keywords, all_review_keywords=list(all_keywords_list))
-        print(recommended_keywords)
         bookreviews = self.selector.get_reviews_by_keywords(keywords=recommended_keywords)
-        serializer = UserBookReviewSerializer(bookreviews, many=True)
+        serializer = ExtendedBookReviewSerializer(bookreviews, many=True)
         return {"keywords": recommended_keywords, "reviews": serializer.data}
