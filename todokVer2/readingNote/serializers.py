@@ -97,7 +97,7 @@ class ReadingNoteSaveSerializer(serializers.ModelSerializer):
         if exquestion_id is None:
             return None
         else:
-            ExQuestionOngoing.objects.get(exquestion_id=exquestion_id)
+            return ExQuestionOngoing.objects.get(exquestion_id=exquestion_id)
 
     def save(self, user_id, book_id, requested_data):
         user = get_object_or_404(User, id=user_id)
