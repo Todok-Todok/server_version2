@@ -115,6 +115,14 @@ class RecentSearchedAPIView(APIView):
         UserService(UserSelector).remove_one_history(user_id,request.data["content"])
         return Response(status=status.HTTP_200_OK)
 
+class DuplicationCheckAPIView(APIView):
+    def post(self, request):
+        if request.GET['target'] == 'email':
+            exists = User.objects.filter(email=request.data['data']).exists()
+        else:
+            exists = User.objects.filter(nickname=request.data['data']).exists()
+
+        return Response(not exists, status=status.HTTP_200_OK)
 
 # 소셜로그인
 from allauth.socialaccount.providers.google import views as google_view
@@ -135,7 +143,7 @@ from rest_framework.decorators import api_view
 '''
 
 state = getattr(secret, 'STATE')
-BASE_URL = 'http://127.0.0.1:8000/'
+BASE_URL = 'http://15.165.101.25:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/google/callback/'
 KAKAO_CALLBACK_URI = BASE_URL + 'user/kakao/callback/'
 
