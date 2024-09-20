@@ -117,6 +117,6 @@ class BookSearchInDBAPIView(ListAPIView):
         return response
 
 class KeywordsExtractingAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
         keywords_list = extract_keywords(request.data["review_content"])
         return Response({"keywords": keywords_list}, status=status.HTTP_200_OK)
