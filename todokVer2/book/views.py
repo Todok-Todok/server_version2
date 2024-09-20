@@ -56,14 +56,10 @@ class RecommendBookByGenreAPIView(APIView):
         books_list = BookService(BookSelector).get_recommended_books(user_id=user_id)
         return Response(books_list, status=status.HTTP_200_OK)
 
-class BookSentenceAPIView(ListAPIView):
-    queryset = BookSentence.objects.all()
-    serializer_class = BookSentenceSerializer
-    pagination_class = LimitOffsetPagination
-
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        return response
+class BookSentenceAPIView(APIView):
+    def get(self, request):
+        sentences_list = BookService(BookSelector).get_all_booksentences()
+        return Response({"result": sentences_list}, status=status.HTTP_200_OK)
 
 class BookDetailAPIView(APIView):
     def get(self, request, book_id):
