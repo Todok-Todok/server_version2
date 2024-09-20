@@ -182,7 +182,7 @@ def google_callback(request):
         if accept_status != 200:
             return Response({'err_msg': 'failed to signup'}, status=accept_status)
         accept_json = accept.json()
-        accept_json.pop('user', None)  # 유저 정보 (pk, email) 는 response에서 빼고 싶을 때 !
+        #accept_json.pop('user', None)  # 유저 정보 (pk, email) 는 response에서 빼고 싶을 때 !
         return Response(accept_json)
 
 
@@ -242,7 +242,7 @@ def kakao_callback(request):
             return Response({'err_msg': 'failed to signup'}, status=accept_status)
         # user의 pk, email, first name, last name과 Access Token, Refresh token 가져옴
         accept_json = accept.json()
-        accept_json.pop('user', None)
+        #accept_json.pop('user', None)
         return Response(accept_json)
 
 

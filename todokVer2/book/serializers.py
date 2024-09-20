@@ -18,7 +18,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
 class BookSentenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookSentence
-        fields = '__all__'
+        fields = ('genre', 'represent_sentence',)
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
