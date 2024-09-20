@@ -50,7 +50,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 pipe = TextClassificationPipeline(
     model=model,
     tokenizer=tokenizer,
-    device=0, # gpu number, -1 if cpu used
+    device=-1, # gpu number, -1 if cpu used
     return_all_scores=True,
     function_to_apply='sigmoid'
 )
