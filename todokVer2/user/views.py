@@ -185,7 +185,7 @@ def google_callback(request):
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
         # accept_json.pop('user', None) # 유저 정보 (pk, email) 는 response에서 빼고 싶을 때 !
-        return Response(user.id)
+        return Response({"user_id":user.id})
 
 
 class GoogleLogin(SocialLoginView):
@@ -235,7 +235,7 @@ def kakao_callback(request):
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
         # accept_json.pop('user', None)
-        return Response(user.id)
+        return Response({"user_id":user.id})
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         accept = requests.post(
@@ -247,7 +247,7 @@ def kakao_callback(request):
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
         # accept_json.pop('user', None)
-        return Response(user.id)
+        return Response({"user_id":user.id})
 
 
 class KakaoLogin(SocialLoginView):
