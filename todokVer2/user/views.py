@@ -171,9 +171,10 @@ def google_callback(request):
         accept_status = accept.status_code
         if accept_status != 200:
             return Response({'err_msg': 'failed to signin'}, status=accept_status)
-        accept_json = accept.json()
+        tokenkey_dict = accept.json()
+        user = Token.objects.get(key=tokenkey_dict['key']).user
         # accept_json.pop('user', None)
-        return Response(accept_json)
+        return Response({"user_id":user.id})
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         accept = requests.post(
@@ -181,9 +182,10 @@ def google_callback(request):
         accept_status = accept.status_code
         if accept_status != 200:
             return Response({'err_msg': 'failed to signup'}, status=accept_status)
-        accept_json = accept.json()
-        #accept_json.pop('user', None)  # 유저 정보 (pk, email) 는 response에서 빼고 싶을 때 !
-        return Response(accept_json)
+        tokenkey_dict = accept.json()
+        user = Token.objects.get(key=tokenkey_dict['key']).user
+        # accept_json.pop('user', None) # 유저 정보 (pk, email) 는 response에서 빼고 싶을 때 !
+        return Response(user.id)
 
 
 class GoogleLogin(SocialLoginView):
@@ -230,9 +232,10 @@ def kakao_callback(request):
         accept_status = accept.status_code
         if accept_status != 200:
             return Response({'err_msg': 'failed to signin'}, status=accept_status)
-        accept_json = accept.json()
+        tokenkey_dict = accept.json()
+        user = Token.objects.get(key=tokenkey_dict['key']).user
         # accept_json.pop('user', None)
-        return Response(accept_json)
+        return Response(user.id)
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         accept = requests.post(
@@ -241,9 +244,10 @@ def kakao_callback(request):
         if accept_status != 200:
             return Response({'err_msg': 'failed to signup'}, status=accept_status)
         # user의 pk, email, first name, last name과 Access Token, Refresh token 가져옴
-        accept_json = accept.json()
-        #accept_json.pop('user', None)
-        return Response(accept_json)
+        tokenkey_dict = accept.json()
+        user = Token.objects.get(key=tokenkey_dict['key']).user
+        # accept_json.pop('user', None)
+        return Response(user.id)
 
 
 class KakaoLogin(SocialLoginView):
