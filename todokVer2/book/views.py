@@ -29,7 +29,7 @@ class SearchAPIView(APIView):
         return Response({"result": book_list}, status=status.HTTP_200_OK)
 
 class EachSearchAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
         book_url = request.data['book_url']
         asyncio.run(EachBookCrawler().get_each_book_info(book_url))
         return Response(status=status.HTTP_201_CREATED)
