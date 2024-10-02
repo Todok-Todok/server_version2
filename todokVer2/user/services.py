@@ -1,8 +1,7 @@
 from .models import *
 from .serializers import *
 from .selectors.abstracts import UserSelector
-from django.db.models.query import QuerySet
-from typing import List, Tuple, Optional, Dict
+from typing import Optional
 
 
 class UserService:
@@ -28,3 +27,6 @@ class UserService:
             user.save()
 
         return password
+
+    def check_onboarding(self, user: User) -> "Optional[bool]":
+        return self.selector.whether_personal_info_exists(user=user)

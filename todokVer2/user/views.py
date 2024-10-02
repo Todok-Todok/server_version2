@@ -48,14 +48,16 @@ class LoginAPIView(APIView):
             except:
                 # [FIX]: token이 없는 경우 (token 생성 이후 기간이 지나 token이 만료되어 사라진 경우) token 재생성
                 token = Token.objects.create(user=user)
-            res = Response(
+            check_existence = UserService(UserSelector).check_onboarding(user=user)
+
+            return Response(
                 {
                     #"user": serializer.data,
                     #"message": "login success",
-                    "user_id": user.id
+                    "user_id": user.id,
+                    "onboarding": check_existence       # 이미 온보딩 했으면 True
                 },
                 status=status.HTTP_200_OK)
-            return res
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -173,8 +175,9 @@ def google_callback(request):
             return Response({'err_msg': 'failed to signin'}, status=accept_status)
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
+        check_existence = UserService(UserSelector).check_onboarding(user=user)
         # accept_json.pop('user', None)
-        return Response({"user_id":user.id})
+        return Response({"user_id":user.id, "onboarding": check_existence})
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         accept = requests.post(
@@ -184,8 +187,9 @@ def google_callback(request):
             return Response({'err_msg': 'failed to signup'}, status=accept_status)
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
+        check_existence = UserService(UserSelector).check_onboarding(user=user)
         # accept_json.pop('user', None) # 유저 정보 (pk, email) 는 response에서 빼고 싶을 때 !
-        return Response({"user_id":user.id})
+        return Response({"user_id":user.id, "onboarding": check_existence})
 
 
 class GoogleLogin(SocialLoginView):
@@ -234,8 +238,9 @@ def kakao_callback(request):
             return Response({'err_msg': 'failed to signin'}, status=accept_status)
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
+        check_existence = UserService(UserSelector).check_onboarding(user=user)
         # accept_json.pop('user', None)
-        return Response({"user_id":user.id})
+        return Response({"user_id":user.id, "onboarding": check_existence})
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         accept = requests.post(
@@ -246,8 +251,9 @@ def kakao_callback(request):
         # user의 pk, email, first name, last name과 Access Token, Refresh token 가져옴
         tokenkey_dict = accept.json()
         user = Token.objects.get(key=tokenkey_dict['key']).user
+        check_existence = UserService(UserSelector).check_onboarding(user=user)
         # accept_json.pop('user', None)
-        return Response({"user_id":user.id})
+        return Response({"user_id":user.id, "onboarding": check_existence})
 
 
 class KakaoLogin(SocialLoginView):

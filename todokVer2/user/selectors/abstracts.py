@@ -21,3 +21,6 @@ class UserSelector(AbstractUserSelector):
 
     def get_user_userid(user_id: int) -> User:
         return get_object_or_404(User, id=user_id)
+
+    def whether_personal_info_exists(user: User) -> bool:
+        return PersonalizingInfo.objects.filter(user=user).exists()
