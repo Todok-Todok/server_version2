@@ -25,7 +25,7 @@ class AdditionalBookCrawler:
             return None
         else:
             book_objs = driver.find_elements(By.XPATH, '//*[@id="shopData_list"]/ul/li')
-            print(len(book_objs))
+            #print(len(book_objs))
             for book_obj in book_objs:
                 asyncio.run(self.crawling_book_list(book_obj))
 
@@ -44,7 +44,7 @@ class AdditionalBookCrawler:
         for keyword in keywords:
             keywords_list.append(keyword.text)
 
-        each_book_dict['book_iamge'] = book_image
+        each_book_dict['book_image'] = book_image
         each_book_dict['author'] = author
         each_book_dict['title'] = title
         each_book_dict['keywords'] = keywords_list

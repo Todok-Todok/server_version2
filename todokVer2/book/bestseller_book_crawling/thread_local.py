@@ -2,19 +2,23 @@ import threading
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium_stealth import stealth
 
-User_Agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.6613.113 Safari/537.36"
+#User_Agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.6613.86 Safari/537.36"
 service = Service(executable_path='/home/ubuntu/server_version2/todokVer2/chromedriver-linux64/chromedriver')
 chrome_options = Options()
-#chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless")
 
 # linux 환경에서 필요한 option
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option('useAutomationExtension', False)
 chrome_options.add_argument("--disable-setuid-sandbox")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--remote-allow-origins=*")
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
-chrome_options.add_argument(f"user-agent={User_Agent }")
+#chrome_options.add_argument(f"user-agent={User_Agent }")
+
 
 
 class ThreadLocalService:
@@ -29,6 +33,14 @@ class ThreadLocalService:
             self.sema.acquire()
             # ChromeDriver 설정
             self._driver_local.driver = webdriver.Chrome(service=service, options=chrome_options)
+            stealth(self._driver_local.driver,
+                    languages=["en-US", "en"],
+                    vendor="Google Inc.",
+                    platform="Win32",
+                    webgl_vendor="Intel Inc.",
+                    renderer="Intel Iris OpenGL Engine",
+                    fix_hairline=True,
+            )
         return self._driver_local.driver
 
     def quit_driver(self):

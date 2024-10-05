@@ -26,7 +26,7 @@ class SearchAPIView(APIView):
     def get(self, request):
         book_name = request.GET['book_name']
         book_list = AdditionalBookCrawler().main(book_name)
-        return Response({"result": book_list}, status=status.HTTP_200_OK)
+        return Response({"results": book_list}, status=status.HTTP_200_OK)
 
 class EachSearchAPIView(APIView):
     def post(self, request):
