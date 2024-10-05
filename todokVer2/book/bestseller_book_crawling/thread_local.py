@@ -9,6 +9,9 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 
 # linux 환경에서 필요한 option
+chrome_options.add_argument("--disable-setuid-sandbox")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--remote-allow-origins=*")
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 #chrome_options.add_argument(f"user-agent={User_Agent }")
