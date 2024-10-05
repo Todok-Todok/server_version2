@@ -20,9 +20,13 @@ chrome_options.add_argument('--disable-dev-shm-usage')
 class ThreadLocalService:
     def __init__(self):
         self._driver_local = threading.local()
+        # 세마포 객체 생성. 한번에 실행될 쓰레드를 3개로 제한
+        self.sema = threading.Semaphore(3)
 
     def get_driver(self):
         if not hasattr(self._driver_local, 'driver'):
+            # 세마포어 획득
+            self.sema.acquire()
             # ChromeDriver 설정
             self._driver_local.driver = webdriver.Chrome(service=service, options=chrome_options)
         return self._driver_local.driver
@@ -31,3 +35,6 @@ class ThreadLocalService:
         if hasattr(self._driver_local, 'driver'):
             self._driver_local.driver.quit()
             del self._driver_local.driver
+
+            # 세마포어 해제
+            self.sema.release()

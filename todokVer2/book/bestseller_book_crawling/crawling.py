@@ -40,7 +40,8 @@ class BookCrawler:
             self.url_by_genre.append(genre.find_element(By.TAG_NAME, 'a').get_attribute("href"))
 
         # ThreadPoolExecutor를 사용하여 crawling_by_genre 함수를 병렬로 실행
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(5, os.cpu_count())) as executor:
+        # aws 서버의 vCPU = 1 (1코어)인 관계로 max_worker의 수는 1로 !
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(1, os.cpu_count())) as executor:
             futures = [executor.submit(self.crawling_by_genre, url) for url in self.url_by_genre]
             for future in concurrent.futures.as_completed(futures):
                 try:
@@ -181,4 +182,3 @@ class EachBookCrawler:
         await sync_to_async(db_operations)()
 
         self.thread_local_service.quit_driver()
-
