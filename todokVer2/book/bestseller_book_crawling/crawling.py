@@ -28,22 +28,21 @@ BOOK_TABLE_OF_CONTENT_PATH = '.product_detail_area.book_contents .auto_overflow_
 class BookCrawler:
     def __init__(self):
         self.thread_local_service = ThreadLocalService()
-        self.url_by_genre = list()
-        # 세마포 객체 생성. 한번에 실행될 쓰레드를 3개로 제한
-        self.sema = threading.Semaphore(3)
+        self.url_by_genre = ["https://product.kyobobook.co.kr/category/KOR/01",
+                             "https://product.kyobobook.co.kr/category/KOR/03",
+                             "https://product.kyobobook.co.kr/category/KOR/05",
+                             "https://product.kyobobook.co.kr/category/KOR/07",
+                             "https://product.kyobobook.co.kr/category/KOR/13",
+                             "https://product.kyobobook.co.kr/category/KOR/15",
+                             "https://product.kyobobook.co.kr/category/KOR/17",
+                             "https://product.kyobobook.co.kr/category/KOR/29"]
+        # 세마포 객체 생성. 한번에 실행될 쓰레드를 2개로 제한
+        self.sema = threading.Semaphore(2)
 
 
     def main(self):
         # 세마포어 획득
         self.sema.acquire()
-        
-        driver = self.thread_local_service.get_driver()
-        driver.get(CRAWLING_URL)
-
-        genre_obj = driver.find_elements(By.XPATH, '//*[@id="contents"]/div/aside/div[2]/div[1]/ul/li')
-
-        for genre in genre_obj:
-            self.url_by_genre.append(genre.find_element(By.TAG_NAME, 'a').get_attribute("href"))
 
         # ThreadPoolExecutor를 사용하여 crawling_by_genre 함수를 병렬로 실행
         # aws 서버의 vCPU = 1 (1코어)인 관계로 max_worker의 수는 최소한으로 !
@@ -58,7 +57,6 @@ class BookCrawler:
         self.thread_local_service.quit_driver()
         # 세마포어 해제
         self.sema.release()
-
 
     def crawling_by_genre(self, url):
         print("장르 크롤링 페이지 들어옴")
