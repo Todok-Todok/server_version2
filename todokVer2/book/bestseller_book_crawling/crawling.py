@@ -45,8 +45,8 @@ class BookCrawler:
         self.sema.acquire()
 
         # ThreadPoolExecutor를 사용하여 crawling_by_genre 함수를 병렬로 실행
-        # aws 서버의 vCPU = 1 (1코어)인 관계로 max_worker의 수는 1로 !
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(1, os.cpu_count())) as executor:
+        # aws 서버의 vCPU = 1 (1코어)인 관계로 max_worker의 수는 최소한으로 !
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, os.cpu_count())) as executor:
             futures = [executor.submit(self.crawling_by_genre, url) for url in self.url_by_genre]
             for future in concurrent.futures.as_completed(futures):
                 try:
@@ -59,6 +59,7 @@ class BookCrawler:
         self.sema.release()
 
     def crawling_by_genre(self, url):
+        print("장르 크롤링 페이지 들어옴")
         driver = self.thread_local_service.get_driver()
         driver.get(url)
         driver.implicitly_wait(3)
