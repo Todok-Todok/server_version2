@@ -31,8 +31,8 @@ class SearchAPIView(APIView):
 class EachSearchAPIView(APIView):
     def post(self, request):
         book_url = request.data['book_url']
-        asyncio.run(EachBookCrawler().get_each_book_info(book_url))
-        return Response(status=status.HTTP_201_CREATED)
+        book_id = asyncio.run(EachBookCrawler().get_each_book_info(book_url))
+        return Response({"book_id": book_id}, status=status.HTTP_201_CREATED)
 
 class UserBookAPIView(APIView):
     # 읽는 중인 책으로 추가

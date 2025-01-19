@@ -4,6 +4,7 @@ from django.db.models.query import QuerySet
 from book.models import Book, UserBook, BookSentence
 from user.models import User, PersonalizingInfo
 from typing import Dict, Optional, List
+from django.db.models import Count
 import random
 
 class AbstractBookSelector(metaclass=ABCMeta):
@@ -45,7 +46,9 @@ class BookSelector(AbstractBookSelector):
     def get_books_by_fav_genre(user_id: int) -> "Queryset[Book]":
         user = get_object_or_404(User, id=user_id)
         fav_genre_list = PersonalizingInfo.objects.get(user=user).fav_genre_keywords
-        books = Book.objects.filter(genre__in=fav_genre_list).order_by('?')[:4]
+        books = (Book.objects.filter(genre__in=fav_genre_list)
+                .annotate(note_count=Count('readingnote'))
+                .order_by('-note_count', '?')[:4])
         return books
 
     def get_booksentences(self) -> "Queryset[BookSentence]":
