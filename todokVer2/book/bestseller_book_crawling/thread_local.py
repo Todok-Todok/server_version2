@@ -23,7 +23,7 @@ class ThreadLocalService:
     def get_driver(self):
         if not hasattr(self._driver_local, 'driver'):
             # ChromeDriver 설정
-            self._driver_local.driver = webdriver.Chrome(service=service, options=chrome_options)
+            self._driver_local.driver = webdriver.Chrome(options=chrome_options)
         return self._driver_local.driver
 
     def quit_driver(self):

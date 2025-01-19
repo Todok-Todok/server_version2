@@ -1,4 +1,5 @@
 import os
+import time
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -28,10 +29,10 @@ BOOK_TABLE_OF_CONTENT_PATH = '.product_detail_area.book_contents .auto_overflow_
 class BookCrawler:
     def __init__(self):
         self.thread_local_service = ThreadLocalService()
-        self.url_by_genre = ["https://product.kyobobook.co.kr/category/KOR/01",
-                             "https://product.kyobobook.co.kr/category/KOR/03",
-                             "https://product.kyobobook.co.kr/category/KOR/05",
-                             "https://product.kyobobook.co.kr/category/KOR/07",
+        self.url_by_genre = [#"https://product.kyobobook.co.kr/category/KOR/01",
+                             #"https://product.kyobobook.co.kr/category/KOR/03",
+                             #"https://product.kyobobook.co.kr/category/KOR/05",
+                             #"https://product.kyobobook.co.kr/category/KOR/07",
                              "https://product.kyobobook.co.kr/category/KOR/13",
                              "https://product.kyobobook.co.kr/category/KOR/15",
                              "https://product.kyobobook.co.kr/category/KOR/17",
@@ -53,8 +54,8 @@ class BookCrawler:
                     future.result()  # 예외 발생 시 처리
                 except Exception as e:
                     print(f"Error occurred: {e}")
-
-        self.thread_local_service.quit_driver()
+        
+        #self.thread_local_service.quit_driver()
         # 세마포어 해제
         self.sema.release()
 
@@ -70,9 +71,17 @@ class BookCrawler:
             detail_url = obj.find_element(By.TAG_NAME, 'a').get_attribute("href")
             driver.get(detail_url)
             # ----
-            pagination_list = driver.find_elements(By.XPATH, '//*[@id="allTopPagi"]/div/a')
+            try:
+                pagination_list = driver.find_elements(By.XPATH, '//*[@id="allTopPagi"]/div/a')
+            except Exception:
+                pagination_list = driver.find_elements(By.XPATH, '//*[@id="bestTopPagi"]/div/a')
+
+            try:
+                next_page_button = driver.find_element(By.XPATH, '//*[@id="allTopPagi"]/button[2]')
+            except Exception:
+                next_page_button = driver.find_element(By.XPATH, '//*[@id="bestTopPagi"]/button[2]')
+            
             last_page_number = int(pagination_list[-1].text)
-            next_page_button = driver.find_element(By.XPATH, '//*[@id="allTopPagi"]/button[2]')
 
             for i in range(last_page_number):
                 self.crawling_each_urls()
@@ -82,6 +91,7 @@ class BookCrawler:
                     driver.execute_script("arguments[0].click();", next_page_button)
                     driver.implicitly_wait(3)
             # ----
+        self.thread_local_service.quit_driver()    
 
 
     #async def crawling_each_urls(self):
@@ -97,7 +107,10 @@ class BookCrawler:
                 each_book_urls.append(book.find_element(By.TAG_NAME, 'a').get_attribute("href"))
 
         for each_url in each_book_urls:
-            asyncio.run(EachBookCrawler().get_each_book_info(each_url))
+            try:
+                asyncio.run(EachBookCrawler().get_each_book_info(each_url))
+            except Exception:
+                continue
             # 각 get_each_book_info 호출을 태스크로 생성하여 tasks 리스트에 추가
         #     tasks.append(asyncio.create_task(self.get_each_book_info(each_url)))
         #
@@ -161,31 +174,43 @@ class EachBookCrawler:
             book_image = ""
 
         # 책 소개 기반 키워드 추출
-        keywords = extract_keywords(intro)
+        try:
+            keywords = extract_keywords(intro)
+        except Exception:
+            self.thread_local_service.quit_driver()
+            return
 
         # 트랜잭션을 사용하여 데이터베이스 작업을 원자적으로 처리
         # 중복된 데이터가 저장되는 것을 방지
         def db_operations():
-            with transaction.atomic():
-                # 데이터베이스에 저장하는 작업을 비동기적으로 처리
-                book_data_dict = dict(
-                    title=title,
-                    author=author,
-                    publisher=publisher,
-                    genre=genre,
-                    isbn=isbn,
-                    published_at=published_at,
-                    table_of_content=table_of_content,
-                    keywords=keywords,
-                    entire_pages=entire_pages,
-                    book_image=book_image)
-                serializer = BookSerializer(data=book_data_dict)
-                if serializer.is_valid():  # 유효성 검사 (책 중복 저장 방지)
-                    book = serializer.save()  # 저장
-                    BookDetail.objects.create(
-                        book=book,
-                        intro=intro
-                    )
-        await sync_to_async(db_operations)()
+            # isbn에 해당하는 책이 이미 저장되어 있는지 확인
+            try:
+                book_obj = Book.objects.get(isbn=isbn)
+                return book_obj.book_id
+            except Book.DoesNotExist:
+                with transaction.atomic():
+                    # 데이터베이스에 저장하는 작업을 비동기적으로 처리
+                    book_data_dict = dict(
+                        title=title,
+                        author=author,
+                        publisher=publisher,
+                        genre=genre,
+                        isbn=isbn,
+                        published_at=published_at,
+                        table_of_content=table_of_content,
+                        keywords=keywords,
+                        entire_pages=entire_pages,
+                        book_image=book_image)
+                    serializer = BookSerializer(data=book_data_dict)
+                    if serializer.is_valid():  # 유효성 검사 (책 중복 저장 방지)
+                        book = serializer.save()  # 저장
+                        BookDetail.objects.create(
+                            book=book,
+                            intro=intro
+                        )
+                return book.book_id
+
+        book_id = await sync_to_async(db_operations)()
 
         self.thread_local_service.quit_driver()
+        return book_id

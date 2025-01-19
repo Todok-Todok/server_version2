@@ -104,4 +104,4 @@ class BookSimpleSerializer(serializers.ModelSerializer):
 class BookSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ('book_image','keywords','author','title','genre',)
+        fields = ('book_id','book_image','keywords','author','title','genre',)

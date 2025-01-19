@@ -145,7 +145,7 @@ from rest_framework.decorators import api_view
 '''
 
 state = getattr(secret, 'STATE')
-BASE_URL = 'http://15.165.101.25:8000/'
+BASE_URL = 'http://15.165.101.25/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'user/google/callback/'
 KAKAO_CALLBACK_URI = BASE_URL + 'user/kakao/callback/'
 
