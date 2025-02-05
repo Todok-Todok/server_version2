@@ -37,6 +37,8 @@ class BookService:
     def save_reading_pages(self,user_id: int, book_id: int, pages: int) -> int:
         userbook = self.selector.get_userbook_detail_by_ids(user_id=user_id, book_id=book_id)
         entire_pages = userbook.book.entire_pages
+        if entire_pages == 0:
+            return 0
         userbook.reading_pages = pages
         userbook.reading_percent = int((pages/entire_pages)*100)
         today_str = str(date.today())
