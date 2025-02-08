@@ -104,6 +104,8 @@ emotion_questions = {
 
 # 감정 분석을 바탕으로 질문 생성
 def generate_questions(text: str, top_n: int = 3) -> List[str]:
+    if not text.strip():  # 빈 문자열 또는 공백만 있는 경우 방지
+        return list()
     pipe_output = pipe(text)[0]
 
     # 상위 N개의 감정 레이블 추출
